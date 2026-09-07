@@ -67,28 +67,109 @@
 
     <!-- 全体収支サマリーカード -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <!-- 収入・資産 -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div class="flex justify-between items-start">
-          <span class="text-xs font-semibold text-slate-500">総資産・収入合計</span>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">資産側</span>
+      <!-- 収入・資産（アコーディオン付きカード） -->
+      <div id="incomeSummaryCard" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs transition md:col-span-1">
+        <div id="incomeCardHeader" class="flex justify-between items-start cursor-pointer group select-none">
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-semibold text-slate-500 group-hover:text-emerald-700 transition">総資産・収入合計</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">資産側</span>
+            </div>
+            <div class="mt-2 text-2xl font-bold text-slate-900 tracking-tight" id="totalIncomeDisplay">¥0</div>
+            <div class="mt-1 text-xs text-slate-400" id="incomeDetailText">収入・確保資産の合計 (0件)</div>
+          </div>
+          <div class="flex items-center text-slate-400 group-hover:text-emerald-600 transition">
+            <span class="text-[11px] font-semibold mr-1" id="incomeToggleLabel">開く</span>
+            <svg id="incomeChevron" class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
-        <div class="mt-2 text-2xl font-bold text-slate-900 tracking-tight" id="totalIncomeDisplay">¥0</div>
-        <div class="mt-1 text-xs text-slate-400" id="incomeDetailText">収入: ¥0 / 予備資産: ¥0</div>
+
+        <!-- 収入・資産 アコーディオンコンテンツ（初期状態は非表示） -->
+        <div id="incomeAccordionContent" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-800">収入・資産明細一覧</h3>
+            <button id="addIncomeBtn" type="button" class="inline-flex items-center px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold rounded-lg shadow-xs transition cursor-pointer">
+              <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              追加
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                  <th class="py-1.5 px-1">項目名</th>
+                  <th class="py-1.5 px-1 text-right">金額</th>
+                  <th class="py-1.5 px-1 text-center w-12">操作</th>
+                </tr>
+              </thead>
+              <tbody id="incomeTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- JS生成 -->
+              </tbody>
+            </table>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs font-bold text-slate-900">
+            <span>収入合計</span>
+            <span id="incomeSubtotalDisplay" class="text-emerald-600">¥0</span>
+          </div>
+        </div>
       </div>
 
-      <!-- 支出予定 (口座引落のみ) -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div class="flex justify-between items-start">
-          <span class="text-xs font-semibold text-slate-500">支出予定 (引落合計)</span>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">口座引落</span>
+      <!-- 支出予定 (引落合計) （アコーディオン付きカード） -->
+      <div id="expenseSummaryCard" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs transition md:col-span-1">
+        <div id="expenseCardHeader" class="flex justify-between items-start cursor-pointer group select-none">
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-semibold text-slate-500 group-hover:text-blue-700 transition">支出予定 (引落合計)</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">口座引落</span>
+            </div>
+            <div class="mt-2 text-2xl font-bold text-slate-900 tracking-tight" id="totalExpensesDisplay">¥0</div>
+            <div class="mt-1 text-xs text-slate-400" id="expenseDetailText">全口座の引落予定 合計</div>
+          </div>
+          <div class="flex items-center text-slate-400 group-hover:text-blue-600 transition">
+            <span class="text-[11px] font-semibold mr-1" id="expenseToggleLabel">開く</span>
+            <svg id="expenseChevron" class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
-        <div class="mt-2 text-2xl font-bold text-slate-900 tracking-tight" id="totalExpensesDisplay">¥0</div>
-        <div class="mt-1 text-xs text-slate-400" id="expenseDetailText">指定口座からの引落合計</div>
+
+        <!-- 支出 アコーディオンコンテンツ（初期状態は非表示） -->
+        <div id="expenseAccordionContent" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <select id="accountFilterSelect" class="text-[11px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+              <option value="ALL">すべての口座</option>
+            </select>
+            <button id="addExpenseBtn" type="button" class="inline-flex items-center px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold rounded-lg shadow-xs transition cursor-pointer">
+              <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              追加
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                  <th class="py-1.5 px-1">項目名</th>
+                  <th class="py-1.5 px-1">口座</th>
+                  <th class="py-1.5 px-1 text-right">金額</th>
+                  <th class="py-1.5 px-1 text-center w-12">操作</th>
+                </tr>
+              </thead>
+              <tbody id="expenseTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- JS生成 -->
+              </tbody>
+            </table>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs font-bold text-slate-900">
+            <span>引落合計</span>
+            <span id="expenseSubtotalDisplay" class="text-blue-700">¥0</span>
+          </div>
+        </div>
       </div>
 
       <!-- 収支差額 -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs md:col-span-1">
         <div class="flex justify-between items-start">
           <span class="text-xs font-semibold text-slate-500">今月の収支差額</span>
           <span class="text-xs px-2 py-0.5 rounded-full font-medium" id="balanceBadge">計算中</span>
@@ -364,8 +445,43 @@
     }
 
     let state = loadSavedState();
-    let currentTab = 'incomes';
+    let isIncomeOpen = false;
+    let isExpenseOpen = false;
     let currentAccountFilter = 'ALL';
+
+    function toggleIncomeAccordion(forceState) {
+      isIncomeOpen = typeof forceState === 'boolean' ? forceState : !isIncomeOpen;
+      const content = document.getElementById('incomeAccordionContent');
+      const chevron = document.getElementById('incomeChevron');
+      const label = document.getElementById('incomeToggleLabel');
+
+      if (isIncomeOpen) {
+        content.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+        if (label) label.textContent = '閉じる';
+      } else {
+        content.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+        if (label) label.textContent = '開く';
+      }
+    }
+
+    function toggleExpenseAccordion(forceState) {
+      isExpenseOpen = typeof forceState === 'boolean' ? forceState : !isExpenseOpen;
+      const content = document.getElementById('expenseAccordionContent');
+      const chevron = document.getElementById('expenseChevron');
+      const label = document.getElementById('expenseToggleLabel');
+
+      if (isExpenseOpen) {
+        content.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+        if (label) label.textContent = '閉じる';
+      } else {
+        content.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+        if (label) label.textContent = '開く';
+      }
+    }
 
     // 自動保存
     function saveData() {
@@ -456,14 +572,17 @@
 
       container.querySelectorAll('.view-acc-detail-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const acc = e.target.getAttribute('data-acc');
-          switchTab('expenses');
+          toggleExpenseAccordion(true);
           const filterSel = document.getElementById('accountFilterSelect');
           if (filterSel) {
             filterSel.value = acc;
             currentAccountFilter = acc;
             renderExpenseTable();
           }
+          const card = document.getElementById('expenseSummaryCard');
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
       });
     }
@@ -661,11 +780,6 @@
           }
         }
 
-        const incBadge = document.getElementById('incomeCountBadge');
-        const expBadge = document.getElementById('expenseCountBadge');
-        if (incBadge) incBadge.textContent = state.incomes.length;
-        if (expBadge) expBadge.textContent = state.expenses.length;
-
         // 各サブ描画呼び出し
         renderAccountCards();
         renderExpenseTable();
@@ -678,147 +792,6 @@
       }
     }
 
-    // タブ切替（左：収入、右：支出）
-    function switchTab(tab) {
-      currentTab = tab;
-      const tInc = document.getElementById('tabIncomes');
-      const tExp = document.getElementById('tabExpenses');
-
-      const sInc = document.getElementById('incomesSection');
-      const sExp = document.getElementById('expensesSection');
-
-      [tInc, tExp].forEach(b => {
-        if (b) b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1.5 cursor-pointer';
-      });
-      if (sInc) sInc.classList.add('hidden');
-      if (sExp) sExp.classList.add('hidden');
-
-      if (tab === 'incomes') {
-        if (tInc) tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer';
-        if (sInc) sInc.classList.remove('hidden');
-      } else if (tab === 'expenses') {
-        if (tExp) tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer';
-        if (sExp) sExp.classList.remove('hidden');
-      }
-    }
-
-    // モーダル処理
-    function openAddModal(type) {
-      document.getElementById('modalType').value = type;
-      document.getElementById('modalItemId').value = '';
-      document.getElementById('modalNameInput').value = '';
-      document.getElementById('modalAmountInput').value = '';
-
-      const accField = document.getElementById('modalAccountField');
-      const title = document.getElementById('modalTitle');
-
-      if (type === 'expense') {
-        title.textContent = '引き落とし明細を追加';
-        accField.classList.remove('hidden');
-      } else {
-        title.textContent = '収入・資産項目を追加';
-        accField.classList.add('hidden');
-      }
-
-      document.getElementById('itemModal').classList.remove('hidden');
-      document.getElementById('modalNameInput').focus();
-    }
-
-    function openEditModal(type, id) {
-      document.getElementById('modalType').value = type;
-      document.getElementById('modalItemId').value = id;
-
-      const accField = document.getElementById('modalAccountField');
-      const title = document.getElementById('modalTitle');
-
-      let item = null;
-      if (type === 'expense') {
-        item = state.expenses.find(e => e.id === id);
-        title.textContent = '引き落とし明細を編集';
-        accField.classList.remove('hidden');
-        if (item) document.getElementById('modalAccountSelect').value = item.account;
-      } else {
-        item = state.incomes.find(e => e.id === id);
-        title.textContent = '収入・資産項目を編集';
-        accField.classList.add('hidden');
-      }
-
-      if (!item) return;
-      document.getElementById('modalNameInput').value = item.name;
-      document.getElementById('modalAmountInput').value = item.amount;
-      document.getElementById('itemModal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('itemModal').classList.add('hidden');
-    }
-
-    function deleteItem(type, id) {
-      if (type === 'expense') {
-        state.expenses = state.expenses.filter(e => e.id !== id);
-      } else {
-        state.incomes = state.incomes.filter(e => e.id !== id);
-      }
-      saveData();
-      renderApp();
-      showToast('項目を削除しました');
-    }
-
-    // ATMモーダル表示
-    function openAtmModal() {
-      const container = document.getElementById('atmListContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (!state.transferredStatus) state.transferredStatus = {};
-
-      state.accounts.forEach(acc => {
-        const accExpenses = state.expenses.filter(e => e.account === acc);
-        const total = accExpenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-        const isDone = !!state.transferredStatus[acc];
-        const style = getAccountColor(acc);
-
-        const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer active:scale-[0.98] transition ${
-          isDone ? 'bg-emerald-50/80 border-emerald-300' : 'bg-white border-slate-200'
-        }`;
-
-        card.innerHTML = `
-          <div class="flex items-center space-x-2.5">
-            <div class="w-5 h-5 rounded flex items-center justify-center border ${
-              isDone ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
-            }">
-              ${isDone ? '✓' : ''}
-            </div>
-            <div>
-              <div class="text-xs font-bold text-slate-900 flex items-center space-x-1">
-                <span>${acc}</span>
-                <span class="text-[10px] px-1 py-0.2 rounded font-medium ${style.badge}">件数: ${accExpenses.length}</span>
-              </div>
-              <div class="text-[11px] text-slate-500 mt-0.5">${accExpenses.map(e => e.name).join(' / ') || '明細なし'}</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-bold ${isDone ? 'text-emerald-700' : 'text-slate-900'}">${formatYen(total)}</div>
-            <div class="text-[10px] font-semibold ${isDone ? 'text-emerald-600' : 'text-slate-400'}">${isDone ? '入金済' : '未振込'}</div>
-          </div>
-        `;
-
-        card.addEventListener('click', () => {
-          if (!state.transferredStatus) state.transferredStatus = {};
-          state.transferredStatus[acc] = !state.transferredStatus[acc];
-          saveData();
-          openAtmModal();
-          renderApp();
-        });
-
-        container.appendChild(card);
-      });
-
-      document.getElementById('atmModal').classList.remove('hidden');
-    }
-
-    // イベント初期化
     function initEvents() {
       renderApp();
 
@@ -841,9 +814,16 @@
         renderApp();
       });
 
-      // タブ（左：収入、右：支出）
-      document.getElementById('tabIncomes').addEventListener('click', () => switchTab('incomes'));
-      document.getElementById('tabExpenses').addEventListener('click', () => switchTab('expenses'));
+      // サマリーカードタップでカード内アコーディオンの開閉（トグル）
+      const incomeHeader = document.getElementById('incomeCardHeader');
+      if (incomeHeader) {
+        incomeHeader.addEventListener('click', () => toggleIncomeAccordion());
+      }
+
+      const expenseHeader = document.getElementById('expenseCardHeader');
+      if (expenseHeader) {
+        expenseHeader.addEventListener('click', () => toggleExpenseAccordion());
+      }
 
       // フィルター
       document.getElementById('accountFilterSelect').addEventListener('change', (e) => {
