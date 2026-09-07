@@ -346,7 +346,7 @@
   </div>
 
   <script>
-    // 初期データ
+    // デフォルト初期データ
     const defaultData = {
       targetMonth: '2026-09',
       accounts: ['労働金庫', '山形銀行', '荘内銀行', '現金'],
@@ -372,13 +372,23 @@
       transferredStatus: {}
     };
 
-    // 保存データ取得
+    // 防衛的データ読み込み関数（欠損プロパティを自動補完）
     function loadSavedState() {
       try {
         const saved = localStorage.getItem('kakeibo_data_v3');
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            targetMonth: parsed.targetMonth || '2026-09',
+            accounts: Array.isArray(parsed.accounts) && parsed.accounts.length > 0 ? parsed.accounts : defaultData.accounts,
+            incomes: Array.isArray(parsed.incomes) ? parsed.incomes : defaultData.incomes,
+            reserves: Array.isArray(parsed.reserves) ? parsed.reserves : defaultData.reserves,
+            expenses: Array.isArray(parsed.expenses) ? parsed.expenses : defaultData.expenses,
+            transferredStatus: (parsed.transferredStatus && typeof parsed.transferredStatus === 'object') ? parsed.transferredStatus : {}
+          };
+        }
       } catch (e) {
-        console.error("データ読み込みエラー", e);
+        console.error("データ読み込みエラー。初期状態を復元します。", e);
       }
       return JSON.parse(JSON.stringify(defaultData));
     }
@@ -414,6 +424,7 @@
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
+      if (!toast) return;
       toast.textContent = msg;
       toast.classList.remove('opacity-0', 'pointer-events-none');
       setTimeout(() => {
@@ -427,9 +438,11 @@
       if (!container) return;
       container.innerHTML = '';
 
+      if (!state.transferredStatus) state.transferredStatus = {};
+
       state.accounts.forEach(acc => {
         const accExpenses = state.expenses.filter(e => e.account === acc);
-        const total = accExpenses.reduce((s, e) => s + Number(e.amount), 0);
+        const total = accExpenses.reduce((s, e) => s + Number(e.amount || 0), 0);
         const isDone = !!state.transferredStatus[acc];
         const style = getAccountColor(acc);
 
@@ -463,6 +476,7 @@
       container.querySelectorAll('.acc-check-box').forEach(chk => {
         chk.addEventListener('change', (e) => {
           const acc = e.target.getAttribute('data-acc');
+          if (!state.transferredStatus) state.transferredStatus = {};
           state.transferredStatus[acc] = e.target.checked;
           saveData();
           renderApp();
@@ -508,16 +522,17 @@
             </td>
             <td class="py-2.5 px-2 text-right font-bold text-slate-900">${formatYen(item.amount)}</td>
             <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-exp-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-exp-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+              <button type="button" class="edit-exp-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-exp-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
         });
       }
 
-      const subtotal = filtered.reduce((s, i) => s + Number(i.amount), 0);
-      document.getElementById('expenseSubtotalDisplay').textContent = formatYen(subtotal);
+      const subtotal = filtered.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const subtotalEl = document.getElementById('expenseSubtotalDisplay');
+      if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
       tbody.querySelectorAll('.edit-exp-btn').forEach(b => {
         b.addEventListener('click', () => openEditModal('expense', b.getAttribute('data-id')));
@@ -543,16 +558,17 @@
             <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
             <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
             <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-res-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-res-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+              <button type="button" class="edit-res-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-res-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
         });
       }
 
-      const subtotal = state.reserves.reduce((s, i) => s + Number(i.amount), 0);
-      document.getElementById('reserveSubtotalDisplay').textContent = formatYen(subtotal);
+      const subtotal = state.reserves.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const subtotalEl = document.getElementById('reserveSubtotalDisplay');
+      if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
       tbody.querySelectorAll('.edit-res-btn').forEach(b => {
         b.addEventListener('click', () => openEditModal('reserve', b.getAttribute('data-id')));
@@ -578,16 +594,17 @@
             <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
             <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
             <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-inc-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-inc-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+              <button type="button" class="edit-inc-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-inc-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
         });
       }
 
-      const subtotal = state.incomes.reduce((s, i) => s + Number(i.amount), 0);
-      document.getElementById('incomeSubtotalDisplay').textContent = formatYen(subtotal);
+      const subtotal = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const subtotalEl = document.getElementById('incomeSubtotalDisplay');
+      if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
       tbody.querySelectorAll('.edit-inc-btn').forEach(b => {
         b.addEventListener('click', () => openEditModal('income', b.getAttribute('data-id')));
@@ -608,7 +625,7 @@
         span.className = 'inline-flex items-center text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg font-medium text-slate-700';
         span.innerHTML = `
           <span>${acc}</span>
-          <button type="button" class="ml-1.5 text-slate-400 hover:text-rose-600 del-acc-btn" data-acc="${acc}">✕</button>
+          <button type="button" class="ml-1.5 text-slate-400 hover:text-rose-600 del-acc-btn cursor-pointer" data-acc="${acc}">✕</button>
         `;
         container.appendChild(span);
       });
@@ -625,7 +642,7 @@
             return;
           }
           state.accounts = state.accounts.filter(a => a !== acc);
-          delete state.transferredStatus[acc];
+          if (state.transferredStatus) delete state.transferredStatus[acc];
           saveData();
           renderApp();
           showToast(`口座「${acc}」を削除しました`);
@@ -669,50 +686,65 @@
 
     // 全体再描画
     function renderApp() {
-      // 1. 年月
-      const [year, month] = state.targetMonth.split('-');
-      document.getElementById('currentMonthLabel').textContent = `${year}年${parseInt(month, 10)}月`;
-      document.getElementById('atmModalMonth').textContent = `${year}年${parseInt(month, 10)}月分`;
+      try {
+        // 1. 年月
+        const [year, month] = (state.targetMonth || '2026-09').split('-');
+        const monthLabel = document.getElementById('currentMonthLabel');
+        const atmMonth = document.getElementById('atmModalMonth');
+        if (monthLabel) monthLabel.textContent = `${year}年${parseInt(month, 10)}月`;
+        if (atmMonth) atmMonth.textContent = `${year}年${parseInt(month, 10)}月分`;
 
-      // 2. 集計（予備費を資産側に計算）
-      const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount), 0);
-      const totalReserves = state.reserves.reduce((s, r) => s + Number(r.amount), 0);
-      const totalAssets = totalIncome + totalReserves; // 資産側合計
-      const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount), 0); // 引落合計
-      const balance = totalAssets - totalExpenses; // 収支差額
+        // 2. 集計（予備費を資産側に計算）
+        const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+        const totalReserves = state.reserves.reduce((s, r) => s + Number(r.amount || 0), 0);
+        const totalAssets = totalIncome + totalReserves; // 資産側合計
+        const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0); // 引落合計
+        const balance = totalAssets - totalExpenses; // 収支差額
 
-      // 3. サマリー表示
-      document.getElementById('totalIncomeDisplay').textContent = formatYen(totalAssets);
-      document.getElementById('incomeDetailText').textContent = `収入: ${formatYen(totalIncome)} / 予備資産: ${formatYen(totalReserves)}`;
+        // 3. サマリー表示
+        const totIncEl = document.getElementById('totalIncomeDisplay');
+        const incDetEl = document.getElementById('incomeDetailText');
+        if (totIncEl) totIncEl.textContent = formatYen(totalAssets);
+        if (incDetEl) incDetEl.textContent = `収入: ${formatYen(totalIncome)} / 予備資産: ${formatYen(totalReserves)}`;
 
-      document.getElementById('totalExpensesDisplay').textContent = formatYen(totalExpenses);
-      document.getElementById('expenseDetailText').textContent = `全口座の引落予定 合計`;
+        const totExpEl = document.getElementById('totalExpensesDisplay');
+        const expDetEl = document.getElementById('expenseDetailText');
+        if (totExpEl) totExpEl.textContent = formatYen(totalExpenses);
+        if (expDetEl) expDetEl.textContent = `全口座の引落予定 合計`;
 
-      const balanceDisplay = document.getElementById('balanceDisplay');
-      const balanceBadge = document.getElementById('balanceBadge');
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const balanceBadge = document.getElementById('balanceBadge');
 
-      if (balance >= 0) {
-        balanceDisplay.className = 'mt-2 text-2xl font-bold tracking-tight text-emerald-600';
-        balanceDisplay.textContent = `+${formatYen(balance)}`;
-        balanceBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-700';
-        balanceBadge.textContent = '余剰あり';
-      } else {
-        balanceDisplay.className = 'mt-2 text-2xl font-bold tracking-tight text-rose-600';
-        balanceDisplay.textContent = `-${formatYen(Math.abs(balance))}`;
-        balanceBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-rose-50 text-rose-700';
-        balanceBadge.textContent = '不足 (赤字)';
+        if (balanceDisplay && balanceBadge) {
+          if (balance >= 0) {
+            balanceDisplay.className = 'mt-2 text-2xl font-bold tracking-tight text-emerald-600';
+            balanceDisplay.textContent = `+${formatYen(balance)}`;
+            balanceBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-700';
+            balanceBadge.textContent = '余剰あり';
+          } else {
+            balanceDisplay.className = 'mt-2 text-2xl font-bold tracking-tight text-rose-600';
+            balanceDisplay.textContent = `-${formatYen(Math.abs(balance))}`;
+            balanceBadge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-rose-50 text-rose-700';
+            balanceBadge.textContent = '不足 (赤字)';
+          }
+        }
+
+        const expBadge = document.getElementById('expenseCountBadge');
+        const resBadge = document.getElementById('reserveCountBadge');
+        if (expBadge) expBadge.textContent = state.expenses.length;
+        if (resBadge) resBadge.textContent = state.reserves.length;
+
+        // 各サブ描画呼び出し
+        renderAccountCards();
+        renderExpenseTable();
+        renderReserveTable();
+        renderIncomeTable();
+        renderAccountSettings();
+        updateSelectOptions();
+
+      } catch (err) {
+        console.error("renderApp内部エラー:", err);
       }
-
-      document.getElementById('expenseCountBadge').textContent = state.expenses.length;
-      document.getElementById('reserveCountBadge').textContent = state.reserves.length;
-
-      // 各テーブル描画
-      renderAccountCards();
-      renderExpenseTable();
-      renderReserveTable();
-      renderIncomeTable();
-      renderAccountSettings();
-      updateSelectOptions();
     }
 
     // タブ切替
@@ -727,21 +759,21 @@
       const sInc = document.getElementById('incomesSection');
 
       [tExp, tRes, tInc].forEach(b => {
-        b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer';
+        if (b) b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer';
       });
-      sExp.classList.add('hidden');
-      sRes.classList.add('hidden');
-      sInc.classList.add('hidden');
+      if (sExp) sExp.classList.add('hidden');
+      if (sRes) sRes.classList.add('hidden');
+      if (sInc) sInc.classList.add('hidden');
 
       if (tab === 'expenses') {
-        tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
-        sExp.classList.remove('hidden');
+        if (tExp) tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
+        if (sExp) sExp.classList.remove('hidden');
       } else if (tab === 'reserves') {
-        tRes.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
-        sRes.classList.remove('hidden');
+        if (tRes) tRes.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
+        if (sRes) sRes.classList.remove('hidden');
       } else if (tab === 'incomes') {
-        tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
-        sInc.classList.remove('hidden');
+        if (tInc) tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
+        if (sInc) sInc.classList.remove('hidden');
       }
     }
 
@@ -819,11 +851,14 @@
     // ATMモーダル表示
     function openAtmModal() {
       const container = document.getElementById('atmListContainer');
+      if (!container) return;
       container.innerHTML = '';
+
+      if (!state.transferredStatus) state.transferredStatus = {};
 
       state.accounts.forEach(acc => {
         const accExpenses = state.expenses.filter(e => e.account === acc);
-        const total = accExpenses.reduce((s, e) => s + Number(e.amount), 0);
+        const total = accExpenses.reduce((s, e) => s + Number(e.amount || 0), 0);
         const isDone = !!state.transferredStatus[acc];
         const style = getAccountColor(acc);
 
@@ -854,6 +889,7 @@
         `;
 
         card.addEventListener('click', () => {
+          if (!state.transferredStatus) state.transferredStatus = {};
           state.transferredStatus[acc] = !state.transferredStatus[acc];
           saveData();
           openAtmModal();
@@ -872,7 +908,7 @@
 
       // 月変更
       document.getElementById('prevMonthBtn').addEventListener('click', () => {
-        let [y, m] = state.targetMonth.split('-').map(Number);
+        let [y, m] = (state.targetMonth || '2026-09').split('-').map(Number);
         m -= 1;
         if (m < 1) { m = 12; y -= 1; }
         state.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
@@ -881,7 +917,7 @@
       });
 
       document.getElementById('nextMonthBtn').addEventListener('click', () => {
-        let [y, m] = state.targetMonth.split('-').map(Number);
+        let [y, m] = (state.targetMonth || '2026-09').split('-').map(Number);
         m += 1;
         if (m > 12) { m = 1; y += 1; }
         state.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
