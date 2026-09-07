@@ -51,11 +51,11 @@
 
       <!-- 対象月切り替え -->
       <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
-        <button id="prevMonthBtn" type="button" class="p-1.5 rounded text-slate-600 active:bg-white transition">
+        <button id="prevMonthBtn" type="button" class="p-1.5 rounded text-slate-600 hover:bg-white active:bg-white transition cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </button>
         <div class="px-2 font-bold text-xs sm:text-sm text-slate-800 tracking-wide" id="currentMonthLabel">2026年9月</div>
-        <button id="nextMonthBtn" type="button" class="p-1.5 rounded text-slate-600 active:bg-white transition">
+        <button id="nextMonthBtn" type="button" class="p-1.5 rounded text-slate-600 hover:bg-white active:bg-white transition cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
@@ -108,7 +108,7 @@
           </div>
           <p class="text-xs text-slate-500 mt-0.5">今月、各口座にいくら用意・振込が必要か</p>
         </div>
-        <button id="openAtmViewBtn" type="button" class="inline-flex items-center justify-center px-3 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-xs font-medium rounded-xl shadow transition">
+        <button id="openAtmViewBtn" type="button" class="inline-flex items-center justify-center px-3 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-xs font-medium rounded-xl shadow transition cursor-pointer">
           <svg class="w-4 h-4 mr-1.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
@@ -124,15 +124,15 @@
 
     <!-- タブメニュー -->
     <div class="bg-slate-200 p-1 rounded-xl flex space-x-1 text-xs sm:text-sm font-medium">
-      <button id="tabExpenses" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1">
+      <button id="tabExpenses" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer">
         <span>引き落とし・支出</span>
-        <span id="expenseCountBadge" class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded-full font-bold">9</span>
+        <span id="expenseCountBadge" class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
       </button>
-      <button id="tabReserves" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1">
+      <button id="tabReserves" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer">
         <span>予備費・確保資産</span>
-        <span id="reserveCountBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">2</span>
+        <span id="reserveCountBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
       </button>
-      <button id="tabIncomes" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1">
+      <button id="tabIncomes" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer">
         <span>収入管理</span>
       </button>
     </div>
@@ -145,10 +145,10 @@
           <p class="text-xs text-slate-500">指定口座から自動引き落としされる項目</p>
         </div>
         <div class="flex items-center space-x-2">
-          <select id="accountFilterSelect" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <select id="accountFilterSelect" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
             <option value="ALL">すべての口座</option>
           </select>
-          <button id="addExpenseBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+          <button id="addExpenseBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
             <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
             追加
           </button>
@@ -184,7 +184,7 @@
           <h3 class="text-sm sm:text-base font-bold text-slate-900">予備費・確保資産（特別費・積立）</h3>
           <p class="text-xs text-slate-500">手元や口座に確保・蓄積しておく予備資金</p>
         </div>
-        <button id="addReserveBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+        <button id="addReserveBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
           <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
           追加
         </button>
@@ -218,7 +218,7 @@
           <h3 class="text-sm sm:text-base font-bold text-slate-900">収入（手取り資産）</h3>
           <p class="text-xs text-slate-500">給与や手当などの収入項目</p>
         </div>
-        <button id="addIncomeBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+        <button id="addIncomeBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
           <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
           追加
         </button>
@@ -247,7 +247,7 @@
 
     <!-- 口座マスター設定 & データ管理 -->
     <section class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-      <button id="toggleAccountSettingsBtn" type="button" class="w-full px-4 py-3 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition text-left">
+      <button id="toggleAccountSettingsBtn" type="button" class="w-full px-4 py-3 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition text-left cursor-pointer">
         <div class="flex items-center space-x-2">
           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           <span class="text-xs font-bold text-slate-700">引落口座の設定・データのリセット</span>
@@ -263,12 +263,12 @@
 
         <div class="flex items-center gap-2 pt-1">
           <input type="text" id="newAccountInput" placeholder="新しい口座名（例: ゆうちょ銀行）" class="text-xs border border-slate-200 rounded-lg px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-          <button id="createAccountBtn" type="button" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold">口座追加</button>
+          <button id="createAccountBtn" type="button" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold cursor-pointer">口座追加</button>
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
           <span class="text-xs text-slate-400">初期状態に戻す</span>
-          <button id="resetDataBtn" type="button" class="text-xs text-rose-600 hover:underline font-semibold">データを初期化する</button>
+          <button id="resetDataBtn" type="button" class="text-xs text-rose-600 hover:underline font-semibold cursor-pointer">データを初期化する</button>
         </div>
       </div>
     </section>
@@ -280,7 +280,7 @@
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-slate-100">
         <h3 id="modalTitle" class="text-base font-bold text-slate-900">項目を追加</h3>
-        <button id="closeModalBtn" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+        <button id="closeModalBtn" type="button" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -309,8 +309,8 @@
         </div>
 
         <div class="flex space-x-2 pt-3">
-          <button type="button" id="modalCancelBtn" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">キャンセル</button>
-          <button type="submit" class="flex-1 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-md">保存する</button>
+          <button type="button" id="modalCancelBtn" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer">キャンセル</button>
+          <button type="submit" class="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md cursor-pointer">保存する</button>
         </div>
       </form>
     </div>
@@ -324,7 +324,7 @@
           <h3 class="text-base font-bold text-slate-900">ATM・銀行 振込チェックシート</h3>
           <p class="text-xs text-slate-500" id="atmModalMonth">2026年9月分</p>
         </div>
-        <button id="closeAtmModalBtn" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+        <button id="closeAtmModalBtn" type="button" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -335,7 +335,7 @@
 
       <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 shrink-0">
         <span>タップして「振込済」にチェック</span>
-        <button id="resetCheckBtn" type="button" class="text-emerald-700 font-semibold hover:underline">チェックを全て解除</button>
+        <button id="resetCheckBtn" type="button" class="text-emerald-700 font-semibold hover:underline cursor-pointer">チェックを全て解除</button>
       </div>
     </div>
   </div>
@@ -346,7 +346,7 @@
   </div>
 
   <script>
-    // --- 初期データ（Excelから再現） ---
+    // 初期データ
     const defaultData = {
       targetMonth: '2026-09',
       accounts: ['労働金庫', '山形銀行', '荘内銀行', '現金'],
@@ -372,13 +372,13 @@
       transferredStatus: {}
     };
 
-    // ローカルストレージからの読み込み
+    // 保存データ取得
     function loadSavedState() {
       try {
-        const saved = localStorage.getItem('kakeibo_data_v2');
+        const saved = localStorage.getItem('kakeibo_data_v3');
         if (saved) return JSON.parse(saved);
       } catch (e) {
-        console.error("読み込みエラー", e);
+        console.error("データ読み込みエラー", e);
       }
       return JSON.parse(JSON.stringify(defaultData));
     }
@@ -390,13 +390,13 @@
     // 自動保存
     function saveData() {
       try {
-        localStorage.setItem('kakeibo_data_v2', JSON.stringify(state));
+        localStorage.setItem('kakeibo_data_v3', JSON.stringify(state));
       } catch (e) {
-        console.error("保存エラー", e);
+        console.error("データ保存エラー", e);
       }
     }
 
-    // 口座の色デザイン
+    // 口座別テーマカラー
     const accountColorMap = {
       '労働金庫': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-800' },
       '山形銀行': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-800' },
@@ -421,6 +421,252 @@
       }, 2000);
     }
 
+    // 口座別カード描画
+    function renderAccountCards() {
+      const container = document.getElementById('accountSummaryCards');
+      if (!container) return;
+      container.innerHTML = '';
+
+      state.accounts.forEach(acc => {
+        const accExpenses = state.expenses.filter(e => e.account === acc);
+        const total = accExpenses.reduce((s, e) => s + Number(e.amount), 0);
+        const isDone = !!state.transferredStatus[acc];
+        const style = getAccountColor(acc);
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-xl border transition relative ${
+          isDone ? 'bg-slate-50 border-slate-200 opacity-75' : `${style.bg} ${style.border}`
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold ${style.text}">${acc}</span>
+            <label class="inline-flex items-center space-x-1 cursor-pointer">
+              <input type="checkbox" ${isDone ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 acc-check-box" data-acc="${acc}">
+              <span class="text-[11px] font-medium ${isDone ? 'text-emerald-700 font-bold' : 'text-slate-500'}">
+                ${isDone ? '入金済' : '未振込'}
+              </span>
+            </label>
+          </div>
+          <div class="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+            ${formatYen(total)}
+          </div>
+          <div class="text-[11px] text-slate-500 mt-1 flex justify-between items-center">
+            <span>引落件数: ${accExpenses.length}件</span>
+            <button type="button" class="text-xs hover:underline text-slate-600 font-semibold view-acc-detail-btn" data-acc="${acc}">詳細</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // イベントリスナー
+      container.querySelectorAll('.acc-check-box').forEach(chk => {
+        chk.addEventListener('change', (e) => {
+          const acc = e.target.getAttribute('data-acc');
+          state.transferredStatus[acc] = e.target.checked;
+          saveData();
+          renderApp();
+          showToast(`${acc}を「${e.target.checked ? '入金済' : '未振込'}」に設定しました`);
+        });
+      });
+
+      container.querySelectorAll('.view-acc-detail-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const acc = e.target.getAttribute('data-acc');
+          switchTab('expenses');
+          const filterSel = document.getElementById('accountFilterSelect');
+          if (filterSel) {
+            filterSel.value = acc;
+            currentAccountFilter = acc;
+            renderExpenseTable();
+          }
+        });
+      });
+    }
+
+    // 引き落としテーブル描画
+    function renderExpenseTable() {
+      const tbody = document.getElementById('expenseTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = currentAccountFilter === 'ALL'
+        ? state.expenses
+        : state.expenses.filter(e => e.account === currentAccountFilter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-xs text-slate-400">該当する引き落とし明細はありません</td></tr>`;
+      } else {
+        filtered.forEach(item => {
+          const style = getAccountColor(item.account);
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+          tr.innerHTML = `
+            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-2">
+              <span class="inline-block text-[11px] px-2 py-0.5 rounded font-medium ${style.badge}">${item.account}</span>
+            </td>
+            <td class="py-2.5 px-2 text-right font-bold text-slate-900">${formatYen(item.amount)}</td>
+            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
+              <button type="button" class="edit-exp-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-exp-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const subtotal = filtered.reduce((s, i) => s + Number(i.amount), 0);
+      document.getElementById('expenseSubtotalDisplay').textContent = formatYen(subtotal);
+
+      tbody.querySelectorAll('.edit-exp-btn').forEach(b => {
+        b.addEventListener('click', () => openEditModal('expense', b.getAttribute('data-id')));
+      });
+      tbody.querySelectorAll('.del-exp-btn').forEach(b => {
+        b.addEventListener('click', () => deleteItem('expense', b.getAttribute('data-id')));
+      });
+    }
+
+    // 予備費テーブル描画
+    function renderReserveTable() {
+      const tbody = document.getElementById('reserveTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (state.reserves.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">予備費の登録はありません</td></tr>`;
+      } else {
+        state.reserves.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+          tr.innerHTML = `
+            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
+            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
+              <button type="button" class="edit-res-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-res-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const subtotal = state.reserves.reduce((s, i) => s + Number(i.amount), 0);
+      document.getElementById('reserveSubtotalDisplay').textContent = formatYen(subtotal);
+
+      tbody.querySelectorAll('.edit-res-btn').forEach(b => {
+        b.addEventListener('click', () => openEditModal('reserve', b.getAttribute('data-id')));
+      });
+      tbody.querySelectorAll('.del-res-btn').forEach(b => {
+        b.addEventListener('click', () => deleteItem('reserve', b.getAttribute('data-id')));
+      });
+    }
+
+    // 収入テーブル描画
+    function renderIncomeTable() {
+      const tbody = document.getElementById('incomeTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (state.incomes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">収入の登録はありません</td></tr>`;
+      } else {
+        state.incomes.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+          tr.innerHTML = `
+            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
+            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
+              <button type="button" class="edit-inc-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
+              <button type="button" class="del-inc-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const subtotal = state.incomes.reduce((s, i) => s + Number(i.amount), 0);
+      document.getElementById('incomeSubtotalDisplay').textContent = formatYen(subtotal);
+
+      tbody.querySelectorAll('.edit-inc-btn').forEach(b => {
+        b.addEventListener('click', () => openEditModal('income', b.getAttribute('data-id')));
+      });
+      tbody.querySelectorAll('.del-inc-btn').forEach(b => {
+        b.addEventListener('click', () => deleteItem('income', b.getAttribute('data-id')));
+      });
+    }
+
+    // 口座管理描画
+    function renderAccountSettings() {
+      const container = document.getElementById('accountListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      state.accounts.forEach(acc => {
+        const span = document.createElement('span');
+        span.className = 'inline-flex items-center text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg font-medium text-slate-700';
+        span.innerHTML = `
+          <span>${acc}</span>
+          <button type="button" class="ml-1.5 text-slate-400 hover:text-rose-600 del-acc-btn" data-acc="${acc}">✕</button>
+        `;
+        container.appendChild(span);
+      });
+
+      container.querySelectorAll('.del-acc-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          const acc = b.getAttribute('data-acc');
+          if (state.accounts.length <= 1) {
+            showToast('最低1つの口座が必要です');
+            return;
+          }
+          if (state.expenses.some(e => e.account === acc)) {
+            showToast(`「${acc}」を使用中の項目があるため削除できません`);
+            return;
+          }
+          state.accounts = state.accounts.filter(a => a !== acc);
+          delete state.transferredStatus[acc];
+          saveData();
+          renderApp();
+          showToast(`口座「${acc}」を削除しました`);
+        });
+      });
+    }
+
+    // プルダウン更新
+    function updateSelectOptions() {
+      const modalSelect = document.getElementById('modalAccountSelect');
+      const filterSelect = document.getElementById('accountFilterSelect');
+
+      if (modalSelect) {
+        const prevModalVal = modalSelect.value;
+        modalSelect.innerHTML = '';
+        state.accounts.forEach(acc => {
+          const opt = document.createElement('option');
+          opt.value = acc;
+          opt.textContent = acc;
+          modalSelect.appendChild(opt);
+        });
+        if (prevModalVal && state.accounts.includes(prevModalVal)) {
+          modalSelect.value = prevModalVal;
+        }
+      }
+
+      if (filterSelect) {
+        const prevFilterVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="ALL">すべての口座</option>';
+        state.accounts.forEach(acc => {
+          const opt = document.createElement('option');
+          opt.value = acc;
+          opt.textContent = acc;
+          filterSelect.appendChild(opt);
+        });
+        if (prevFilterVal && (prevFilterVal === 'ALL' || state.accounts.includes(prevFilterVal))) {
+          filterSelect.value = prevFilterVal;
+        }
+      }
+    }
+
     // 全体再描画
     function renderApp() {
       // 1. 年月
@@ -431,8 +677,8 @@
       // 2. 集計（予備費を資産側に計算）
       const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount), 0);
       const totalReserves = state.reserves.reduce((s, r) => s + Number(r.amount), 0);
-      const totalAssets = totalIncome + totalReserves; // 資産側合計（収入 ＋ 予備資産）
-      const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount), 0); // 支出合計（引落）
+      const totalAssets = totalIncome + totalReserves; // 資産側合計
+      const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount), 0); // 引落合計
       const balance = totalAssets - totalExpenses; // 収支差額
 
       // 3. サマリー表示
@@ -469,138 +715,6 @@
       updateSelectOptions();
     }
 
-    // 予備費テーブル
-    function renderReserveTable() {
-      const tbody = document.getElementById('reserveTableBody');
-      tbody.innerHTML = '';
-
-      if (state.reserves.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-xs text-slate-400">予備費の登録はありません</td></tr>`;
-      } else {
-        state.reserves.forEach(item => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition';
-          tr.innerHTML = `
-            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
-            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
-            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-res-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-res-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      const subtotal = state.reserves.reduce((s, i) => s + Number(i.amount), 0);
-      document.getElementById('reserveSubtotalDisplay').textContent = formatYen(subtotal);
-
-      tbody.querySelectorAll('.edit-res-btn').forEach(b => {
-        b.addEventListener('click', () => openEditModal('reserve', b.getAttribute('data-id')));
-      });
-      tbody.querySelectorAll('.del-res-btn').forEach(b => {
-        b.addEventListener('click', () => deleteItem('reserve', b.getAttribute('data-id')));
-      });
-    }
-
-    // 収入テーブル
-    function renderIncomeTable() {
-      const tbody = document.getElementById('incomeTableBody');
-      tbody.innerHTML = '';
-
-      if (state.incomes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-xs text-slate-400">収入の登録はありません</td></tr>`;
-      } else {
-        state.incomes.forEach(item => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition';
-          tr.innerHTML = `
-            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
-            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
-            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-inc-btn text-slate-400 hover:text-blue-600 p-1" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-inc-btn text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}">🗑️</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      const subtotal = state.incomes.reduce((s, i) => s + Number(i.amount), 0);
-      document.getElementById('incomeSubtotalDisplay').textContent = formatYen(subtotal);
-
-      tbody.querySelectorAll('.edit-inc-btn').forEach(b => {
-        b.addEventListener('click', () => openEditModal('income', b.getAttribute('data-id')));
-      });
-      tbody.querySelectorAll('.del-inc-btn').forEach(b => {
-        b.addEventListener('click', () => deleteItem('income', b.getAttribute('data-id')));
-      });
-    }
-
-    // 口座管理
-    function renderAccountSettings() {
-      const container = document.getElementById('accountListContainer');
-      container.innerHTML = '';
-
-      state.accounts.forEach(acc => {
-        const span = document.createElement('span');
-        span.className = 'inline-flex items-center text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg font-medium text-slate-700';
-        span.innerHTML = `
-          <span>${acc}</span>
-          <button type="button" class="ml-1.5 text-slate-400 hover:text-rose-600 del-acc-btn" data-acc="${acc}">✕</button>
-        `;
-        container.appendChild(span);
-      });
-
-      container.querySelectorAll('.del-acc-btn').forEach(b => {
-        b.addEventListener('click', () => {
-          const acc = b.getAttribute('data-acc');
-          if (state.accounts.length <= 1) {
-            showToast('最低1つの口座が必要です');
-            return;
-          }
-          if (state.expenses.some(e => e.account === acc)) {
-            showToast(`「${acc}」を使用中の項目があるため削除できません`);
-            return;
-          }
-          state.accounts = state.accounts.filter(a => a !== acc);
-          delete state.transferredStatus[acc];
-          saveData();
-          renderApp();
-          showToast(`口座「${acc}」を削除しました`);
-        });
-      });
-    }
-
-    function updateSelectOptions() {
-      const modalSelect = document.getElementById('modalAccountSelect');
-      const filterSelect = document.getElementById('accountFilterSelect');
-
-      const prevModalVal = modalSelect.value;
-      modalSelect.innerHTML = '';
-      state.accounts.forEach(acc => {
-        const opt = document.createElement('option');
-        opt.value = acc;
-        opt.textContent = acc;
-        modalSelect.appendChild(opt);
-      });
-      if (prevModalVal && state.accounts.includes(prevModalVal)) {
-        modalSelect.value = prevModalVal;
-      }
-
-      const prevFilterVal = filterSelect.value;
-      filterSelect.innerHTML = '<option value="ALL">すべての口座</option>';
-      state.accounts.forEach(acc => {
-        const opt = document.createElement('option');
-        opt.value = acc;
-        opt.textContent = acc;
-        filterSelect.appendChild(opt);
-      });
-      if (prevFilterVal && (prevFilterVal === 'ALL' || state.accounts.includes(prevFilterVal))) {
-        filterSelect.value = prevFilterVal;
-      }
-    }
-
     // タブ切替
     function switchTab(tab) {
       currentTab = tab;
@@ -613,25 +727,25 @@
       const sInc = document.getElementById('incomesSection');
 
       [tExp, tRes, tInc].forEach(b => {
-        b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1';
+        b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer';
       });
       sExp.classList.add('hidden');
       sRes.classList.add('hidden');
       sInc.classList.add('hidden');
 
       if (tab === 'expenses') {
-        tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1';
+        tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
         sExp.classList.remove('hidden');
       } else if (tab === 'reserves') {
-        tRes.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1';
+        tRes.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
         sRes.classList.remove('hidden');
       } else if (tab === 'incomes') {
-        tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1';
+        tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
         sInc.classList.remove('hidden');
       }
     }
 
-    // モーダル
+    // モーダル処理
     function openAddModal(type) {
       document.getElementById('modalType').value = type;
       document.getElementById('modalItemId').value = '';
@@ -702,7 +816,7 @@
       showToast('項目を削除しました');
     }
 
-    // ATMモーダル
+    // ATMモーダル表示
     function openAtmModal() {
       const container = document.getElementById('atmListContainer');
       container.innerHTML = '';
@@ -752,8 +866,8 @@
       document.getElementById('atmModal').classList.remove('hidden');
     }
 
-    // 初期化とイベント
-    window.addEventListener('load', () => {
+    // イベント初期化
+    function initEvents() {
       renderApp();
 
       // 月変更
@@ -887,7 +1001,13 @@
         renderApp();
         showToast('振込チェックをリセットしました');
       });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initEvents);
+    } else {
+      initEvents();
+    }
   </script>
 </body>
 </html>
