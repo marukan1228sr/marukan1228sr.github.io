@@ -298,57 +298,103 @@
   </div>
 
   <!-- トースト通知 -->
-  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-medium shadow-lg z-50 opacity-0 pointer-events-none transition duration-300">
-    メッセージ
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-xl z-50 opacity-0 pointer-events-none transition duration-300 flex items-center space-x-3">
+    <span id="toastMsg">メッセージ</span>
+    <button id="undoBtn" type="button" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full transition cursor-pointer">元に戻す</button>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
     // デフォルト初期データ（Excelデータ標準）
     const defaultData = {
       targetMonth: '2026-09',
       accounts: ['労働金庫', '山形銀行', '荘内銀行', '現金'],
-      incomes: [
-        { id: 'inc-1', name: '収入①', amount: 307000 },
-        { id: 'inc-2', name: '収入②', amount: 95000 },
-        { id: 'res-1', name: 'ママメガネ', amount: 20000 },
-        { id: 'res-2', name: '七五三撮影', amount: 22000 }
-      ],
-      expenses: [
-        { id: 'exp-1', name: '楽天カード', amount: 254000, account: '労働金庫' },
-        { id: 'exp-2', name: 'オリコカード', amount: 20000, account: '労働金庫' },
-        { id: 'exp-3', name: 'ガソリン', amount: 10000, account: '現金' },
-        { id: 'exp-4', name: '高摘小', amount: 10000, account: '山形銀行' },
-        { id: 'exp-5', name: 'サッカー', amount: 8000, account: '山形銀行' },
-        { id: 'exp-6', name: '住宅ローン', amount: 80000, account: '労働金庫' },
-        { id: 'exp-7', name: '奨学金', amount: 11000, account: '労働金庫' },
-        { id: 'exp-8', name: '車', amount: 10000, account: '荘内銀行' },
-        { id: 'exp-9', name: 'イオンカード', amount: 25000, account: '労働金庫' }
-      ],
-      transferredStatus: {}
+      monthlyData: {
+        '2026-09': {
+          incomes: [
+            { id: 'inc-1', name: '収入①', amount: 307000 },
+            { id: 'inc-2', name: '収入②', amount: 95000 },
+            { id: 'res-1', name: 'ママメガネ', amount: 20000 },
+            { id: 'res-2', name: '七五三撮影', amount: 22000 }
+          ],
+          expenses: [
+            { id: 'exp-1', name: '楽天カード', amount: 254000, account: '労働金庫' },
+            { id: 'exp-2', name: 'オリコカード', amount: 20000, account: '労働金庫' },
+            { id: 'exp-3', name: 'ガソリン', amount: 10000, account: '現金' },
+            { id: 'exp-4', name: '高摘小', amount: 10000, account: '山形銀行' },
+            { id: 'exp-5', name: 'サッカー', amount: 8000, account: '山形銀行' },
+            { id: 'exp-6', name: '住宅ローン', amount: 80000, account: '労働金庫' },
+            { id: 'exp-7', name: '奨学金', amount: 11000, account: '労働金庫' },
+            { id: 'exp-8', name: '車', amount: 10000, account: '荘内銀行' },
+            { id: 'exp-9', name: 'イオンカード', amount: 25000, account: '労働金庫' }
+          ],
+          transferredStatus: {}
+        }
+      }
     };
 
-    // 保存状態を読み込み
+    // Firebase初期設定 & クラウド同期
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'kakeibo-app-sync';
+    let db = null;
+    let auth = null;
+    let syncDocRef = null;
+    let isCloudSyncing = false;
+
+    if (typeof __firebase_config !== 'undefined') {
+      try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // 認証とリアルタイム同期の設定
+        const initAuth = async () => {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+          
+          syncDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'kakeibo', 'shared_store');
+          
+          onSnapshot(syncDocRef, (snapshot) => {
+            if (snapshot.exists()) {
+              const cloudData = snapshot.data();
+              if (cloudData && cloudData.storeData) {
+                isCloudSyncing = true;
+                store = cloudData.storeData;
+                ensureMonthData(store.targetMonth);
+                saveLocalData();
+                renderApp();
+                isCloudSyncing = false;
+              }
+            } else {
+              // 初回クラウド保存
+              saveData();
+            }
+          }, (err) => {
+            console.warn("クラウド同期エラー(ローカルで動作継続):", err);
+          });
+        };
+
+        initAuth().catch(e => console.warn("認証初期化スキップ", e));
+      } catch (e) {
+        console.warn("Firebase初期化エラー:", e);
+      }
+    }
+
+    // 保存状態の読み込み（ローカルバックアップ付き）
     function loadSavedState() {
       try {
-        const saved = localStorage.getItem('kakeibo_data_v4');
+        const saved = localStorage.getItem('kakeibo_data_v5');
         if (saved) {
           const parsed = JSON.parse(saved);
-          let loadedIncomes = Array.isArray(parsed.incomes) ? parsed.incomes : defaultData.incomes;
-          if (Array.isArray(parsed.reserves) && parsed.reserves.length > 0) {
-            parsed.reserves.forEach(r => {
-              if (!loadedIncomes.some(i => i.id === r.id)) {
-                loadedIncomes.push(r);
-              }
-            });
+          if (parsed && parsed.monthlyData) {
+            return parsed;
           }
-
-          return {
-            targetMonth: parsed.targetMonth || '2026-09',
-            accounts: Array.isArray(parsed.accounts) && parsed.accounts.length > 0 ? parsed.accounts : defaultData.accounts,
-            incomes: loadedIncomes,
-            expenses: Array.isArray(parsed.expenses) ? parsed.expenses : defaultData.expenses,
-            transferredStatus: (parsed.transferredStatus && typeof parsed.transferredStatus === 'object') ? parsed.transferredStatus : {}
-          };
         }
       } catch (e) {
         console.error("データ読み込みエラー。初期状態を復元します。", e);
@@ -356,10 +402,57 @@
       return JSON.parse(JSON.stringify(defaultData));
     }
 
-    let state = loadSavedState();
+    let store = loadSavedState();
+    let lastDeletedItem = null; // Undo（元に戻す）用の履歴保存
     let isIncomeOpen = false;
     let isExpenseOpen = false;
     let currentAccountFilter = 'ALL';
+
+    // 対象月のデータが存在するか確認し、なければ前月データ等の構成を自動コピー作成
+    function ensureMonthData(monthKey) {
+      if (!store.monthlyData) store.monthlyData = {};
+      if (!store.monthlyData[monthKey]) {
+        // 直近のデータがあれば項目名と口座設定を引き継ぎ、無ければ初期状態から複製
+        const existingKeys = Object.keys(store.monthlyData).sort();
+        const prevKey = existingKeys.length > 0 ? existingKeys[existingKeys.length - 1] : null;
+        if (prevKey && store.monthlyData[prevKey]) {
+          const prevData = store.monthlyData[prevKey];
+          store.monthlyData[monthKey] = {
+            incomes: prevData.incomes.map(i => ({ ...i, id: 'inc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4) })),
+            expenses: prevData.expenses.map(e => ({ ...e, id: 'exp-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4) })),
+            transferredStatus: {}
+          };
+        } else {
+          store.monthlyData[monthKey] = JSON.parse(JSON.stringify(defaultData.monthlyData['2026-09']));
+        }
+      }
+    }
+
+    // 現在選択中の月データへのショートカットgetter
+    function getCurrentMonthData() {
+      ensureMonthData(store.targetMonth);
+      return store.monthlyData[store.targetMonth];
+    }
+
+    function saveLocalData() {
+      try {
+        localStorage.setItem('kakeibo_data_v5', JSON.stringify(store));
+      } catch (e) {
+        console.error("ローカル保存エラー", e);
+      }
+    }
+
+    // 保存処理（クラウド ＋ ローカル）
+    async function saveData() {
+      saveLocalData();
+      if (syncDocRef && !isCloudSyncing) {
+        try {
+          await setDoc(syncDocRef, { storeData: store, updatedAt: new Date().toISOString() }, { merge: true });
+        } catch (e) {
+          console.warn("クラウド保存エラー:", e);
+        }
+      }
+    }
 
     function toggleIncomeAccordion(forceState) {
       isIncomeOpen = typeof forceState === 'boolean' ? forceState : !isIncomeOpen;
@@ -395,15 +488,6 @@
       }
     }
 
-    // 保存処理
-    function saveData() {
-      try {
-        localStorage.setItem('kakeibo_data_v4', JSON.stringify(state));
-      } catch (e) {
-        console.error("データ保存エラー", e);
-      }
-    }
-
     // 口座カラーマップ
     const accountColorMap = {
       '労働金庫': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-800' },
@@ -420,18 +504,48 @@
       return '¥' + Number(num || 0).toLocaleString('ja-JP');
     }
 
-    function showToast(msg) {
+    // トースト通知（Undoボタン機能付き）
+    function showToast(msg, canUndo = false) {
       const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const undoBtn = document.getElementById('undoBtn');
       if (!toast) return;
-      toast.textContent = msg;
+
+      toastMsg.textContent = msg;
+      if (canUndo && lastDeletedItem) {
+        undoBtn.classList.remove('hidden');
+      } else {
+        undoBtn.classList.add('hidden');
+      }
+
       toast.classList.remove('opacity-0', 'pointer-events-none');
-      setTimeout(() => {
+      
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
         toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2000);
+      }, 4000);
+    }
+
+    // 元に戻す (Undo) 処理
+    function restoreLastDeleted() {
+      if (!lastDeletedItem) return;
+      const mData = store.monthlyData[lastDeletedItem.month];
+      if (mData) {
+        if (lastDeletedItem.type === 'expense') {
+          mData.expenses.splice(lastDeletedItem.index, 0, lastDeletedItem.item);
+        } else {
+          mData.incomes.splice(lastDeletedItem.index, 0, lastDeletedItem.item);
+        }
+        saveData();
+        renderApp();
+        showToast(`「${lastDeletedItem.item.name}」を元に戻しました`);
+        lastDeletedItem = null;
+      }
     }
 
     // モーダル編集・追加画面を開く
     function openModal(type, id = null) {
+      const mData = getCurrentMonthData();
       document.getElementById('modalType').value = type;
       document.getElementById('modalItemId').value = id || '';
       const nameInput = document.getElementById('modalNameInput');
@@ -442,7 +556,7 @@
       if (type === 'expense') {
         accountField.classList.remove('hidden');
         if (id) {
-          const item = state.expenses.find(e => e.id === id);
+          const item = mData.expenses.find(e => e.id === id);
           if (item) {
             modalTitle.textContent = '引き落とし項目を編集';
             nameInput.value = item.name;
@@ -457,7 +571,7 @@
       } else {
         accountField.classList.add('hidden');
         if (id) {
-          const item = state.incomes.find(i => i.id === id);
+          const item = mData.incomes.find(i => i.id === id);
           if (item) {
             modalTitle.textContent = '収入・資産項目を編集';
             nameInput.value = item.name;
@@ -479,14 +593,23 @@
     }
 
     function deleteItem(type, id) {
+      const mData = getCurrentMonthData();
       if (type === 'expense') {
-        const item = state.expenses.find(e => e.id === id);
-        state.expenses = state.expenses.filter(e => e.id !== id);
-        showToast(`「${item ? item.name : '項目'}」を削除しました`);
+        const idx = mData.expenses.findIndex(e => e.id === id);
+        if (idx !== -1) {
+          const item = mData.expenses[idx];
+          lastDeletedItem = { type: 'expense', item: item, index: idx, month: store.targetMonth };
+          mData.expenses.splice(idx, 1);
+          showToast(`「${item.name}」を削除しました`, true);
+        }
       } else {
-        const item = state.incomes.find(i => i.id === id);
-        state.incomes = state.incomes.filter(i => i.id !== id);
-        showToast(`「${item ? item.name : '項目'}」を削除しました`);
+        const idx = mData.incomes.findIndex(i => i.id === id);
+        if (idx !== -1) {
+          const item = mData.incomes[idx];
+          lastDeletedItem = { type: 'income', item: item, index: idx, month: store.targetMonth };
+          mData.incomes.splice(idx, 1);
+          showToast(`「${item.name}」を削除しました`, true);
+        }
       }
       saveData();
       renderApp();
@@ -498,12 +621,13 @@
       if (!container) return;
       container.innerHTML = '';
 
-      if (!state.transferredStatus) state.transferredStatus = {};
+      const mData = getCurrentMonthData();
+      if (!mData.transferredStatus) mData.transferredStatus = {};
 
-      state.accounts.forEach(acc => {
-        const accExpenses = state.expenses.filter(e => e.account === acc);
+      store.accounts.forEach(acc => {
+        const accExpenses = mData.expenses.filter(e => e.account === acc);
         const total = accExpenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-        const isDone = !!state.transferredStatus[acc];
+        const isDone = !!mData.transferredStatus[acc];
         const style = getAccountColor(acc);
 
         const card = document.createElement('div');
@@ -526,7 +650,7 @@
           </div>
           <div class="text-[11px] text-slate-500 mt-1 flex justify-between items-center">
             <span>引落件数: ${accExpenses.length}件</span>
-            <button type="button" class="text-xs hover:underline text-slate-600 font-semibold view-acc-detail-btn" data-acc="${acc}">詳細</button>
+            <button type="button" class="text-xs hover:underline text-slate-600 font-semibold view-acc-detail-btn cursor-pointer" data-acc="${acc}">詳細</button>
           </div>
         `;
         container.appendChild(card);
@@ -536,8 +660,9 @@
       container.querySelectorAll('.acc-check-box').forEach(chk => {
         chk.addEventListener('change', (e) => {
           const acc = e.target.getAttribute('data-acc');
-          if (!state.transferredStatus) state.transferredStatus = {};
-          state.transferredStatus[acc] = e.target.checked;
+          const currentData = getCurrentMonthData();
+          if (!currentData.transferredStatus) currentData.transferredStatus = {};
+          currentData.transferredStatus[acc] = e.target.checked;
           saveData();
           renderApp();
           showToast(`${acc}を「${e.target.checked ? '入金済' : '未振込'}」に設定しました`);
@@ -567,9 +692,10 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
+      const mData = getCurrentMonthData();
       const filtered = currentAccountFilter === 'ALL'
-        ? state.expenses
-        : state.expenses.filter(e => e.account === currentAccountFilter);
+        ? mData.expenses
+        : mData.expenses.filter(e => e.account === currentAccountFilter);
 
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-xs text-slate-400">該当する引き落とし明細はありません</td></tr>`;
@@ -618,10 +744,11 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      if (state.incomes.length === 0) {
+      const mData = getCurrentMonthData();
+      if (mData.incomes.length === 0) {
         tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">収入・資産の登録はありません</td></tr>`;
       } else {
-        state.incomes.forEach(item => {
+        mData.incomes.forEach(item => {
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-slate-50 transition';
           tr.innerHTML = `
@@ -636,7 +763,7 @@
         });
       }
 
-      const subtotal = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const subtotal = mData.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
       const subtotalEl = document.getElementById('incomeSubtotalDisplay');
       if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
@@ -661,7 +788,8 @@
       if (!container) return;
       container.innerHTML = '';
 
-      state.accounts.forEach(acc => {
+      const mData = getCurrentMonthData();
+      store.accounts.forEach(acc => {
         const span = document.createElement('span');
         span.className = 'inline-flex items-center text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg font-medium text-slate-700';
         span.innerHTML = `
@@ -675,16 +803,16 @@
         b.addEventListener('click', (e) => {
           e.stopPropagation();
           const acc = b.getAttribute('data-acc');
-          if (state.accounts.length <= 1) {
+          if (store.accounts.length <= 1) {
             showToast('最低1つの口座が必要です');
             return;
           }
-          if (state.expenses.some(exp => exp.account === acc)) {
+          if (mData.expenses.some(exp => exp.account === acc)) {
             showToast(`「${acc}」を使用中の項目があるため削除できません`);
             return;
           }
-          state.accounts = state.accounts.filter(a => a !== acc);
-          if (state.transferredStatus) delete state.transferredStatus[acc];
+          store.accounts = store.accounts.filter(a => a !== acc);
+          if (mData.transferredStatus) delete mData.transferredStatus[acc];
           saveData();
           renderApp();
           showToast(`口座「${acc}」を削除しました`);
@@ -700,13 +828,13 @@
       if (modalSelect) {
         const prevModalVal = modalSelect.value;
         modalSelect.innerHTML = '';
-        state.accounts.forEach(acc => {
+        store.accounts.forEach(acc => {
           const opt = document.createElement('option');
           opt.value = acc;
           opt.textContent = acc;
           modalSelect.appendChild(opt);
         });
-        if (prevModalVal && state.accounts.includes(prevModalVal)) {
+        if (prevModalVal && store.accounts.includes(prevModalVal)) {
           modalSelect.value = prevModalVal;
         }
       }
@@ -714,13 +842,13 @@
       if (filterSelect) {
         const prevFilterVal = filterSelect.value;
         filterSelect.innerHTML = '<option value="ALL">すべての口座</option>';
-        state.accounts.forEach(acc => {
+        store.accounts.forEach(acc => {
           const opt = document.createElement('option');
           opt.value = acc;
           opt.textContent = acc;
           filterSelect.appendChild(opt);
         });
-        if (prevFilterVal && (prevFilterVal === 'ALL' || state.accounts.includes(prevFilterVal))) {
+        if (prevFilterVal && (prevFilterVal === 'ALL' || store.accounts.includes(prevFilterVal))) {
           filterSelect.value = prevFilterVal;
         }
       }
@@ -729,20 +857,22 @@
     // 全体再描画
     function renderApp() {
       try {
-        const [year, month] = (state.targetMonth || '2026-09').split('-');
+        const [year, month] = (store.targetMonth || '2026-09').split('-');
         const monthLabel = document.getElementById('currentMonthLabel');
         const atmMonth = document.getElementById('atmModalMonth');
         if (monthLabel) monthLabel.textContent = `${year}年${parseInt(month, 10)}月`;
         if (atmMonth) atmMonth.textContent = `${year}年${parseInt(month, 10)}月分`;
 
-        const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
-        const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+        const mData = getCurrentMonthData();
+
+        const totalIncome = mData.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+        const totalExpenses = mData.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
         const balance = totalIncome - totalExpenses;
 
         const totIncEl = document.getElementById('totalIncomeDisplay');
         const incDetEl = document.getElementById('incomeDetailText');
         if (totIncEl) totIncEl.textContent = formatYen(totalIncome);
-        if (incDetEl) incDetEl.textContent = `収入・確保資産の合計 (${state.incomes.length}件)`;
+        if (incDetEl) incDetEl.textContent = `収入・確保資産の合計 (${mData.incomes.length}件)`;
 
         const totExpEl = document.getElementById('totalExpensesDisplay');
         const expDetEl = document.getElementById('expenseDetailText');
@@ -783,10 +913,11 @@
       if (!container) return;
       container.innerHTML = '';
 
-      state.accounts.forEach(acc => {
-        const accExpenses = state.expenses.filter(e => e.account === acc);
+      const mData = getCurrentMonthData();
+      store.accounts.forEach(acc => {
+        const accExpenses = mData.expenses.filter(e => e.account === acc);
         const total = accExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
-        const isChecked = !!state.transferredStatus[acc];
+        const isChecked = !!mData.transferredStatus[acc];
         const style = getAccountColor(acc);
 
         const card = document.createElement('div');
@@ -816,8 +947,8 @@
         `;
 
         card.addEventListener('click', () => {
-          if (!state.transferredStatus) state.transferredStatus = {};
-          state.transferredStatus[acc] = !state.transferredStatus[acc];
+          if (!mData.transferredStatus) mData.transferredStatus = {};
+          mData.transferredStatus[acc] = !mData.transferredStatus[acc];
           saveData();
           openAtmModal();
           renderApp();
@@ -832,21 +963,28 @@
     function initEvents() {
       renderApp();
 
+      // Undo（元に戻す）ボタンイベント
+      document.getElementById('undoBtn').addEventListener('click', () => {
+        restoreLastDeleted();
+      });
+
       // 月変更
       document.getElementById('prevMonthBtn').addEventListener('click', () => {
-        let [y, m] = (state.targetMonth || '2026-09').split('-').map(Number);
+        let [y, m] = (store.targetMonth || '2026-09').split('-').map(Number);
         m -= 1;
         if (m < 1) { m = 12; y -= 1; }
-        state.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
+        store.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
+        ensureMonthData(store.targetMonth);
         saveData();
         renderApp();
       });
 
       document.getElementById('nextMonthBtn').addEventListener('click', () => {
-        let [y, m] = (state.targetMonth || '2026-09').split('-').map(Number);
+        let [y, m] = (store.targetMonth || '2026-09').split('-').map(Number);
         m += 1;
         if (m > 12) { m = 1; y += 1; }
-        state.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
+        store.targetMonth = `${y}-${String(m).padStart(2, '0')}`;
+        ensureMonthData(store.targetMonth);
         saveData();
         renderApp();
       });
@@ -887,21 +1025,23 @@
 
         if (!name || isNaN(amount)) return;
 
+        const mData = getCurrentMonthData();
+
         if (id) {
           if (type === 'expense') {
-            const item = state.expenses.find(exp => exp.id === id);
+            const item = mData.expenses.find(exp => exp.id === id);
             if (item) { item.name = name; item.amount = amount; item.account = account; }
           } else {
-            const item = state.incomes.find(inc => inc.id === id);
+            const item = mData.incomes.find(inc => inc.id === id);
             if (item) { item.name = name; item.amount = amount; }
           }
           showToast(`「${name}」を更新しました`);
         } else {
           const newId = 'id-' + Date.now();
           if (type === 'expense') {
-            state.expenses.push({ id: newId, name, amount, account });
+            mData.expenses.push({ id: newId, name, amount, account });
           } else {
-            state.incomes.push({ id: newId, name, amount });
+            mData.incomes.push({ id: newId, name, amount });
           }
           showToast(`「${name}」を追加しました`);
         }
@@ -930,11 +1070,11 @@
         const input = document.getElementById('newAccountInput');
         const val = input.value.trim();
         if (!val) return;
-        if (state.accounts.includes(val)) {
+        if (store.accounts.includes(val)) {
           showToast('同名の口座が既に存在します');
           return;
         }
-        state.accounts.push(val);
+        store.accounts.push(val);
         input.value = '';
         saveData();
         renderApp();
@@ -944,7 +1084,7 @@
       // データ初期化
       document.getElementById('resetDataBtn').addEventListener('click', () => {
         if (confirm('入力されたデータを初期の状態に戻しますか？')) {
-          state = JSON.parse(JSON.stringify(defaultData));
+          store = JSON.parse(JSON.stringify(defaultData));
           saveData();
           renderApp();
           showToast('データを初期化しました');
@@ -957,7 +1097,8 @@
         document.getElementById('atmModal').classList.add('hidden');
       });
       document.getElementById('resetCheckBtn').addEventListener('click', () => {
-        state.transferredStatus = {};
+        const mData = getCurrentMonthData();
+        mData.transferredStatus = {};
         saveData();
         openAtmModal();
         renderApp();
