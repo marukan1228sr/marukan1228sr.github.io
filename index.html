@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- iPhone等のホーム画面追加時にGeminiロゴやブラウザ枠なしで単体アプリ起動する設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家計・振込管理">
@@ -65,7 +64,7 @@
   <!-- メインコンテンツ -->
   <main class="max-w-4xl mx-auto px-4 py-4 space-y-5">
 
-    <!-- 全体収支サマリーカード -->
+    <!-- 全体収支サマリーカード（アコーディオン式） -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <!-- 収入・資産（アコーディオン付きカード） -->
       <div id="incomeSummaryCard" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs transition md:col-span-1">
@@ -86,7 +85,7 @@
           </div>
         </div>
 
-        <!-- 収入・資産 アコーディオンコンテンツ（初期状態は非表示） -->
+        <!-- 収入・資産 アコーディオンコンテンツ -->
         <div id="incomeAccordionContent" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3" onclick="event.stopPropagation()">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-bold text-slate-800">収入・資産明細一覧</h3>
@@ -101,7 +100,7 @@
                 <tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
                   <th class="py-1.5 px-1">項目名</th>
                   <th class="py-1.5 px-1 text-right">金額</th>
-                  <th class="py-1.5 px-1 text-center w-12">操作</th>
+                  <th class="py-1.5 px-1 text-center w-14">操作</th>
                 </tr>
               </thead>
               <tbody id="incomeTableBody" class="divide-y divide-slate-100 text-xs">
@@ -135,7 +134,7 @@
           </div>
         </div>
 
-        <!-- 支出 アコーディオンコンテンツ（初期状態は非表示） -->
+        <!-- 支出 アコーディオンコンテンツ -->
         <div id="expenseAccordionContent" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3" onclick="event.stopPropagation()">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <select id="accountFilterSelect" class="text-[11px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
@@ -153,7 +152,7 @@
                   <th class="py-1.5 px-1">項目名</th>
                   <th class="py-1.5 px-1">口座</th>
                   <th class="py-1.5 px-1 text-right">金額</th>
-                  <th class="py-1.5 px-1 text-center w-12">操作</th>
+                  <th class="py-1.5 px-1 text-center w-14">操作</th>
                 </tr>
               </thead>
               <tbody id="expenseTableBody" class="divide-y divide-slate-100 text-xs">
@@ -200,92 +199,6 @@
       <!-- 口座一覧グリッド -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4" id="accountSummaryCards">
         <!-- JSで動的生成 -->
-      </div>
-    </section>
-
-    <!-- タブメニュー（左：収入、右：支出） -->
-    <div class="bg-slate-200 p-1 rounded-xl flex space-x-1 text-xs sm:text-sm font-medium">
-      <button id="tabIncomes" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer">
-        <span>収入</span>
-        <span id="incomeCountBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
-      </button>
-      <button id="tabExpenses" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1.5 cursor-pointer">
-        <span>支出（引き落とし）</span>
-        <span id="expenseCountBadge" class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
-      </button>
-    </div>
-
-    <!-- コンテンツ①：収入明細（左タブ） -->
-    <section id="incomesSection" class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-sm sm:text-base font-bold text-slate-900">収入・資産明細一覧</h3>
-          <p class="text-xs text-slate-500">給与や手当、手元の確保資産・予備資金など</p>
-        </div>
-        <button id="addIncomeBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
-          <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-          収入を追加
-        </button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-              <th class="py-2 px-2">収入・資産項目</th>
-              <th class="py-2 px-2 text-right">金額</th>
-              <th class="py-2 px-2 text-center w-16">操作</th>
-            </tr>
-          </thead>
-          <tbody id="incomeTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
-            <!-- JS生成 -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
-        <span>収入・資産 合計</span>
-        <span id="incomeSubtotalDisplay" class="text-base sm:text-lg text-emerald-600">¥0</span>
-      </div>
-    </section>
-
-    <!-- コンテンツ②：引き落とし・支出明細（右タブ） -->
-    <section id="expensesSection" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
-      <div class="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h3 class="text-sm sm:text-base font-bold text-slate-900">引き落とし明細一覧</h3>
-          <p class="text-xs text-slate-500">指定口座から自動引き落としされる項目</p>
-        </div>
-        <div class="flex items-center space-x-2">
-          <select id="accountFilterSelect" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
-            <option value="ALL">すべての口座</option>
-          </select>
-          <button id="addExpenseBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
-            <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-            支出を追加
-          </button>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-              <th class="py-2 px-2">項目名</th>
-              <th class="py-2 px-2">引落口座</th>
-              <th class="py-2 px-2 text-right">金額</th>
-              <th class="py-2 px-2 text-center w-16">操作</th>
-            </tr>
-          </thead>
-          <tbody id="expenseTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
-            <!-- JS生成 -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
-        <span>引き落とし合計</span>
-        <span id="expenseSubtotalDisplay" class="text-base sm:text-lg text-emerald-700">¥0</span>
       </div>
     </section>
 
@@ -390,7 +303,7 @@
   </div>
 
   <script>
-    // デフォルト初期データ（収入と予備資産を統合）
+    // デフォルト初期データ（Excelデータ標準）
     const defaultData = {
       targetMonth: '2026-09',
       accounts: ['労働金庫', '山形銀行', '荘内銀行', '現金'],
@@ -414,14 +327,13 @@
       transferredStatus: {}
     };
 
-    // 防衛的データ読み込み関数（欠損プロパティ補完 & 旧予備費データを収入へ移行）
+    // 保存状態を読み込み
     function loadSavedState() {
       try {
-        const saved = localStorage.getItem('kakeibo_data_v3');
+        const saved = localStorage.getItem('kakeibo_data_v4');
         if (saved) {
           const parsed = JSON.parse(saved);
           let loadedIncomes = Array.isArray(parsed.incomes) ? parsed.incomes : defaultData.incomes;
-          // 旧バージョンのreservesが存在する場合、incomesに統合
           if (Array.isArray(parsed.reserves) && parsed.reserves.length > 0) {
             parsed.reserves.forEach(r => {
               if (!loadedIncomes.some(i => i.id === r.id)) {
@@ -483,16 +395,16 @@
       }
     }
 
-    // 自動保存
+    // 保存処理
     function saveData() {
       try {
-        localStorage.setItem('kakeibo_data_v3', JSON.stringify(state));
+        localStorage.setItem('kakeibo_data_v4', JSON.stringify(state));
       } catch (e) {
         console.error("データ保存エラー", e);
       }
     }
 
-    // 口座別テーマカラー
+    // 口座カラーマップ
     const accountColorMap = {
       '労働金庫': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-800' },
       '山形銀行': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-800' },
@@ -518,7 +430,69 @@
       }, 2000);
     }
 
-    // 口座別カード描画
+    // モーダル編集・追加画面を開く
+    function openModal(type, id = null) {
+      document.getElementById('modalType').value = type;
+      document.getElementById('modalItemId').value = id || '';
+      const nameInput = document.getElementById('modalNameInput');
+      const amountInput = document.getElementById('modalAmountInput');
+      const accountField = document.getElementById('modalAccountField');
+      const modalTitle = document.getElementById('modalTitle');
+
+      if (type === 'expense') {
+        accountField.classList.remove('hidden');
+        if (id) {
+          const item = state.expenses.find(e => e.id === id);
+          if (item) {
+            modalTitle.textContent = '引き落とし項目を編集';
+            nameInput.value = item.name;
+            amountInput.value = item.amount;
+            document.getElementById('modalAccountSelect').value = item.account;
+          }
+        } else {
+          modalTitle.textContent = '引き落とし項目を追加';
+          nameInput.value = '';
+          amountInput.value = '';
+        }
+      } else {
+        accountField.classList.add('hidden');
+        if (id) {
+          const item = state.incomes.find(i => i.id === id);
+          if (item) {
+            modalTitle.textContent = '収入・資産項目を編集';
+            nameInput.value = item.name;
+            amountInput.value = item.amount;
+          }
+        } else {
+          modalTitle.textContent = '収入・資産項目を追加';
+          nameInput.value = '';
+          amountInput.value = '';
+        }
+      }
+
+      document.getElementById('itemModal').classList.remove('hidden');
+      nameInput.focus();
+    }
+
+    function closeModal() {
+      document.getElementById('itemModal').classList.add('hidden');
+    }
+
+    function deleteItem(type, id) {
+      if (type === 'expense') {
+        const item = state.expenses.find(e => e.id === id);
+        state.expenses = state.expenses.filter(e => e.id !== id);
+        showToast(`「${item ? item.name : '項目'}」を削除しました`);
+      } else {
+        const item = state.incomes.find(i => i.id === id);
+        state.incomes = state.incomes.filter(i => i.id !== id);
+        showToast(`「${item ? item.name : '項目'}」を削除しました`);
+      }
+      saveData();
+      renderApp();
+    }
+
+    // 口座カード描画
     function renderAccountCards() {
       const container = document.getElementById('accountSummaryCards');
       if (!container) return;
@@ -605,14 +579,14 @@
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-slate-50 transition';
           tr.innerHTML = `
-            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
-            <td class="py-2.5 px-2">
-              <span class="inline-block text-[11px] px-2 py-0.5 rounded font-medium ${style.badge}">${item.account}</span>
+            <td class="py-2.5 px-1 font-semibold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-1">
+              <span class="inline-block text-[10px] px-1.5 py-0.5 rounded font-medium ${style.badge}">${item.account}</span>
             </td>
-            <td class="py-2.5 px-2 text-right font-bold text-slate-900">${formatYen(item.amount)}</td>
-            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-exp-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-exp-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
+            <td class="py-2.5 px-1 text-right font-bold text-slate-900">${formatYen(item.amount)}</td>
+            <td class="py-2.5 px-1 text-center space-x-1 whitespace-nowrap">
+              <button type="button" class="edit-exp-btn text-slate-500 hover:text-blue-600 p-1 rounded cursor-pointer" data-id="${item.id}" title="編集">✏️</button>
+              <button type="button" class="del-exp-btn text-slate-500 hover:text-rose-600 p-1 rounded cursor-pointer" data-id="${item.id}" title="削除">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -623,11 +597,18 @@
       const subtotalEl = document.getElementById('expenseSubtotalDisplay');
       if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
+      // イベント割り当て（バブリング停止付き）
       tbody.querySelectorAll('.edit-exp-btn').forEach(b => {
-        b.addEventListener('click', () => openEditModal('expense', b.getAttribute('data-id')));
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openModal('expense', b.getAttribute('data-id'));
+        });
       });
       tbody.querySelectorAll('.del-exp-btn').forEach(b => {
-        b.addEventListener('click', () => deleteItem('expense', b.getAttribute('data-id')));
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteItem('expense', b.getAttribute('data-id'));
+        });
       });
     }
 
@@ -644,11 +625,11 @@
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-slate-50 transition';
           tr.innerHTML = `
-            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
-            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
-            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-inc-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-inc-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
+            <td class="py-2.5 px-1 font-semibold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-1 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
+            <td class="py-2.5 px-1 text-center space-x-1 whitespace-nowrap">
+              <button type="button" class="edit-inc-btn text-slate-500 hover:text-blue-600 p-1 rounded cursor-pointer" data-id="${item.id}" title="編集">✏️</button>
+              <button type="button" class="del-inc-btn text-slate-500 hover:text-rose-600 p-1 rounded cursor-pointer" data-id="${item.id}" title="削除">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -659,11 +640,18 @@
       const subtotalEl = document.getElementById('incomeSubtotalDisplay');
       if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
 
+      // イベント割り当て（バブリング停止付き）
       tbody.querySelectorAll('.edit-inc-btn').forEach(b => {
-        b.addEventListener('click', () => openEditModal('income', b.getAttribute('data-id')));
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openModal('income', b.getAttribute('data-id'));
+        });
       });
       tbody.querySelectorAll('.del-inc-btn').forEach(b => {
-        b.addEventListener('click', () => deleteItem('income', b.getAttribute('data-id')));
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteItem('income', b.getAttribute('data-id'));
+        });
       });
     }
 
@@ -684,13 +672,14 @@
       });
 
       container.querySelectorAll('.del-acc-btn').forEach(b => {
-        b.addEventListener('click', () => {
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
           const acc = b.getAttribute('data-acc');
           if (state.accounts.length <= 1) {
             showToast('最低1つの口座が必要です');
             return;
           }
-          if (state.expenses.some(e => e.account === acc)) {
+          if (state.expenses.some(exp => exp.account === acc)) {
             showToast(`「${acc}」を使用中の項目があるため削除できません`);
             return;
           }
@@ -740,19 +729,16 @@
     // 全体再描画
     function renderApp() {
       try {
-        // 1. 年月
         const [year, month] = (state.targetMonth || '2026-09').split('-');
         const monthLabel = document.getElementById('currentMonthLabel');
         const atmMonth = document.getElementById('atmModalMonth');
         if (monthLabel) monthLabel.textContent = `${year}年${parseInt(month, 10)}月`;
         if (atmMonth) atmMonth.textContent = `${year}年${parseInt(month, 10)}月分`;
 
-        // 2. 集計
         const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
         const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
         const balance = totalIncome - totalExpenses;
 
-        // 3. サマリー表示
         const totIncEl = document.getElementById('totalIncomeDisplay');
         const incDetEl = document.getElementById('incomeDetailText');
         if (totIncEl) totIncEl.textContent = formatYen(totalIncome);
@@ -780,7 +766,6 @@
           }
         }
 
-        // 各サブ描画呼び出し
         renderAccountCards();
         renderExpenseTable();
         renderIncomeTable();
@@ -788,8 +773,60 @@
         updateSelectOptions();
 
       } catch (err) {
-        console.error("renderApp内部エラー:", err);
+        console.error("renderAppエラー:", err);
       }
+    }
+
+    // ATM振込チェックモーダル表示
+    function openAtmModal() {
+      const container = document.getElementById('atmListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      state.accounts.forEach(acc => {
+        const accExpenses = state.expenses.filter(e => e.account === acc);
+        const total = accExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+        const isChecked = !!state.transferredStatus[acc];
+        const style = getAccountColor(acc);
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+          isChecked ? 'bg-emerald-50/80 border-emerald-300' : 'bg-white border-slate-200 hover:border-slate-300'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-5 h-5 rounded-md flex items-center justify-center border ${
+              isChecked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
+            }">
+              ${isChecked ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>' : ''}
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
+                <span>${acc}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded font-medium ${style.badge}">件数: ${accExpenses.length}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5">${accExpenses.map(e => e.name).join(' / ') || '明細なし'}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-bold ${isChecked ? 'text-emerald-700' : 'text-slate-900'}">${formatYen(total)}</div>
+            <div class="text-[10px] font-semibold ${isChecked ? 'text-emerald-600' : 'text-slate-400'}">${isChecked ? '入金完了' : '振込必要'}</div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (!state.transferredStatus) state.transferredStatus = {};
+          state.transferredStatus[acc] = !state.transferredStatus[acc];
+          saveData();
+          openAtmModal();
+          renderApp();
+        });
+
+        container.appendChild(card);
+      });
+
+      document.getElementById('atmModal').classList.remove('hidden');
     }
 
     function initEvents() {
@@ -814,28 +851,28 @@
         renderApp();
       });
 
-      // サマリーカードタップでカード内アコーディオンの開閉（トグル）
-      const incomeHeader = document.getElementById('incomeCardHeader');
-      if (incomeHeader) {
-        incomeHeader.addEventListener('click', () => toggleIncomeAccordion());
-      }
-
-      const expenseHeader = document.getElementById('expenseCardHeader');
-      if (expenseHeader) {
-        expenseHeader.addEventListener('click', () => toggleExpenseAccordion());
-      }
+      // サマリーカードアコーディオン開閉
+      document.getElementById('incomeCardHeader').addEventListener('click', () => toggleIncomeAccordion());
+      document.getElementById('expenseCardHeader').addEventListener('click', () => toggleExpenseAccordion());
 
       // フィルター
       document.getElementById('accountFilterSelect').addEventListener('change', (e) => {
+        e.stopPropagation();
         currentAccountFilter = e.target.value;
         renderExpenseTable();
       });
 
-      // 追加ボタン
-      document.getElementById('addIncomeBtn').addEventListener('click', () => openAddModal('income'));
-      document.getElementById('addExpenseBtn').addEventListener('click', () => openAddModal('expense'));
+      // 追加ボタン（アコーディオン内）
+      document.getElementById('addIncomeBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModal('income');
+      });
+      document.getElementById('addExpenseBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModal('expense');
+      });
 
-      // モーダル閉じる
+      // モーダル操作
       document.getElementById('closeModalBtn').addEventListener('click', closeModal);
       document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
 
@@ -852,13 +889,13 @@
 
         if (id) {
           if (type === 'expense') {
-            const item = state.expenses.find(e => e.id === id);
+            const item = state.expenses.find(exp => exp.id === id);
             if (item) { item.name = name; item.amount = amount; item.account = account; }
           } else {
-            const item = state.incomes.find(e => e.id === id);
+            const item = state.incomes.find(inc => inc.id === id);
             if (item) { item.name = name; item.amount = amount; }
           }
-          showToast(`「${name}」を保存しました`);
+          showToast(`「${name}」を更新しました`);
         } else {
           const newId = 'id-' + Date.now();
           if (type === 'expense') {
@@ -906,7 +943,7 @@
 
       // データ初期化
       document.getElementById('resetDataBtn').addEventListener('click', () => {
-        if (confirm('入力されたデータを初期（Excel読み込み時）の状態に戻しますか？')) {
+        if (confirm('入力されたデータを初期の状態に戻しますか？')) {
           state = JSON.parse(JSON.stringify(defaultData));
           saveData();
           renderApp();
