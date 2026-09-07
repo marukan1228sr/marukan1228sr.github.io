@@ -122,23 +122,54 @@
       </div>
     </section>
 
-    <!-- タブメニュー -->
+    <!-- タブメニュー（左：収入、右：支出） -->
     <div class="bg-slate-200 p-1 rounded-xl flex space-x-1 text-xs sm:text-sm font-medium">
-      <button id="tabExpenses" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer">
-        <span>引き落とし・支出</span>
+      <button id="tabIncomes" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer">
+        <span>収入</span>
+        <span id="incomeCountBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+      </button>
+      <button id="tabExpenses" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1.5 cursor-pointer">
+        <span>支出（引き落とし）</span>
         <span id="expenseCountBadge" class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
-      </button>
-      <button id="tabReserves" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer">
-        <span>予備費・確保資産</span>
-        <span id="reserveCountBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
-      </button>
-      <button id="tabIncomes" type="button" class="flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer">
-        <span>収入管理</span>
       </button>
     </div>
 
-    <!-- コンテンツ①：引き落とし・支出明細 -->
-    <section id="expensesSection" class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
+    <!-- コンテンツ①：収入明細（左タブ） -->
+    <section id="incomesSection" class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm sm:text-base font-bold text-slate-900">収入・資産明細一覧</h3>
+          <p class="text-xs text-slate-500">給与や手当、手元の確保資産・予備資金など</p>
+        </div>
+        <button id="addIncomeBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
+          <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+          収入を追加
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
+              <th class="py-2 px-2">収入・資産項目</th>
+              <th class="py-2 px-2 text-right">金額</th>
+              <th class="py-2 px-2 text-center w-16">操作</th>
+            </tr>
+          </thead>
+          <tbody id="incomeTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+            <!-- JS生成 -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
+        <span>収入・資産 合計</span>
+        <span id="incomeSubtotalDisplay" class="text-base sm:text-lg text-emerald-600">¥0</span>
+      </div>
+    </section>
+
+    <!-- コンテンツ②：引き落とし・支出明細（右タブ） -->
+    <section id="expensesSection" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
       <div class="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 class="text-sm sm:text-base font-bold text-slate-900">引き落とし明細一覧</h3>
@@ -150,7 +181,7 @@
           </select>
           <button id="addExpenseBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
             <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-            追加
+            支出を追加
           </button>
         </div>
       </div>
@@ -174,74 +205,6 @@
       <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
         <span>引き落とし合計</span>
         <span id="expenseSubtotalDisplay" class="text-base sm:text-lg text-emerald-700">¥0</span>
-      </div>
-    </section>
-
-    <!-- コンテンツ②：予備費 -->
-    <section id="reservesSection" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-sm sm:text-base font-bold text-slate-900">予備費・確保資産（特別費・積立）</h3>
-          <p class="text-xs text-slate-500">手元や口座に確保・蓄積しておく予備資金</p>
-        </div>
-        <button id="addReserveBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
-          <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-          追加
-        </button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-              <th class="py-2 px-2">明細名</th>
-              <th class="py-2 px-2 text-right">金額</th>
-              <th class="py-2 px-2 text-center w-16">操作</th>
-            </tr>
-          </thead>
-          <tbody id="reserveTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
-            <!-- JS生成 -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
-        <span>予備費・確保資産 合計</span>
-        <span id="reserveSubtotalDisplay" class="text-base sm:text-lg text-emerald-700">¥0</span>
-      </div>
-    </section>
-
-    <!-- コンテンツ③：収入 -->
-    <section id="incomesSection" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-sm sm:text-base font-bold text-slate-900">収入（手取り資産）</h3>
-          <p class="text-xs text-slate-500">給与や手当などの収入項目</p>
-        </div>
-        <button id="addIncomeBtn" type="button" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
-          <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-          追加
-        </button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-              <th class="py-2 px-2">収入項目</th>
-              <th class="py-2 px-2 text-right">手取り金額</th>
-              <th class="py-2 px-2 text-center w-16">操作</th>
-            </tr>
-          </thead>
-          <tbody id="incomeTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
-            <!-- JS生成 -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-sm font-bold text-slate-900">
-        <span>収入 合計</span>
-        <span id="incomeSubtotalDisplay" class="text-base sm:text-lg text-emerald-600">¥0</span>
       </div>
     </section>
 
@@ -346,15 +309,13 @@
   </div>
 
   <script>
-    // デフォルト初期データ
+    // デフォルト初期データ（収入と予備資産を統合）
     const defaultData = {
       targetMonth: '2026-09',
       accounts: ['労働金庫', '山形銀行', '荘内銀行', '現金'],
       incomes: [
         { id: 'inc-1', name: '収入①', amount: 307000 },
-        { id: 'inc-2', name: '収入②', amount: 95000 }
-      ],
-      reserves: [
+        { id: 'inc-2', name: '収入②', amount: 95000 },
         { id: 'res-1', name: 'ママメガネ', amount: 20000 },
         { id: 'res-2', name: '七五三撮影', amount: 22000 }
       ],
@@ -372,17 +333,26 @@
       transferredStatus: {}
     };
 
-    // 防衛的データ読み込み関数（欠損プロパティを自動補完）
+    // 防衛的データ読み込み関数（欠損プロパティ補完 & 旧予備費データを収入へ移行）
     function loadSavedState() {
       try {
         const saved = localStorage.getItem('kakeibo_data_v3');
         if (saved) {
           const parsed = JSON.parse(saved);
+          let loadedIncomes = Array.isArray(parsed.incomes) ? parsed.incomes : defaultData.incomes;
+          // 旧バージョンのreservesが存在する場合、incomesに統合
+          if (Array.isArray(parsed.reserves) && parsed.reserves.length > 0) {
+            parsed.reserves.forEach(r => {
+              if (!loadedIncomes.some(i => i.id === r.id)) {
+                loadedIncomes.push(r);
+              }
+            });
+          }
+
           return {
             targetMonth: parsed.targetMonth || '2026-09',
             accounts: Array.isArray(parsed.accounts) && parsed.accounts.length > 0 ? parsed.accounts : defaultData.accounts,
-            incomes: Array.isArray(parsed.incomes) ? parsed.incomes : defaultData.incomes,
-            reserves: Array.isArray(parsed.reserves) ? parsed.reserves : defaultData.reserves,
+            incomes: loadedIncomes,
             expenses: Array.isArray(parsed.expenses) ? parsed.expenses : defaultData.expenses,
             transferredStatus: (parsed.transferredStatus && typeof parsed.transferredStatus === 'object') ? parsed.transferredStatus : {}
           };
@@ -394,7 +364,7 @@
     }
 
     let state = loadSavedState();
-    let currentTab = 'expenses';
+    let currentTab = 'incomes';
     let currentAccountFilter = 'ALL';
 
     // 自動保存
@@ -542,42 +512,6 @@
       });
     }
 
-    // 予備費テーブル描画
-    function renderReserveTable() {
-      const tbody = document.getElementById('reserveTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      if (state.reserves.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">予備費の登録はありません</td></tr>`;
-      } else {
-        state.reserves.forEach(item => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition';
-          tr.innerHTML = `
-            <td class="py-2.5 px-2 font-semibold text-slate-800">${item.name}</td>
-            <td class="py-2.5 px-2 text-right font-bold text-emerald-700">${formatYen(item.amount)}</td>
-            <td class="py-2.5 px-2 text-center space-x-1 whitespace-nowrap">
-              <button type="button" class="edit-res-btn text-slate-400 hover:text-blue-600 p-1 cursor-pointer" data-id="${item.id}">✏️</button>
-              <button type="button" class="del-res-btn text-slate-400 hover:text-rose-600 p-1 cursor-pointer" data-id="${item.id}">🗑️</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      const subtotal = state.reserves.reduce((s, i) => s + Number(i.amount || 0), 0);
-      const subtotalEl = document.getElementById('reserveSubtotalDisplay');
-      if (subtotalEl) subtotalEl.textContent = formatYen(subtotal);
-
-      tbody.querySelectorAll('.edit-res-btn').forEach(b => {
-        b.addEventListener('click', () => openEditModal('reserve', b.getAttribute('data-id')));
-      });
-      tbody.querySelectorAll('.del-res-btn').forEach(b => {
-        b.addEventListener('click', () => deleteItem('reserve', b.getAttribute('data-id')));
-      });
-    }
-
     // 収入テーブル描画
     function renderIncomeTable() {
       const tbody = document.getElementById('incomeTableBody');
@@ -585,7 +519,7 @@
       tbody.innerHTML = '';
 
       if (state.incomes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">収入の登録はありません</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-xs text-slate-400">収入・資産の登録はありません</td></tr>`;
       } else {
         state.incomes.forEach(item => {
           const tr = document.createElement('tr');
@@ -694,18 +628,16 @@
         if (monthLabel) monthLabel.textContent = `${year}年${parseInt(month, 10)}月`;
         if (atmMonth) atmMonth.textContent = `${year}年${parseInt(month, 10)}月分`;
 
-        // 2. 集計（予備費を資産側に計算）
+        // 2. 集計
         const totalIncome = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
-        const totalReserves = state.reserves.reduce((s, r) => s + Number(r.amount || 0), 0);
-        const totalAssets = totalIncome + totalReserves; // 資産側合計
-        const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0); // 引落合計
-        const balance = totalAssets - totalExpenses; // 収支差額
+        const totalExpenses = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+        const balance = totalIncome - totalExpenses;
 
         // 3. サマリー表示
         const totIncEl = document.getElementById('totalIncomeDisplay');
         const incDetEl = document.getElementById('incomeDetailText');
-        if (totIncEl) totIncEl.textContent = formatYen(totalAssets);
-        if (incDetEl) incDetEl.textContent = `収入: ${formatYen(totalIncome)} / 予備資産: ${formatYen(totalReserves)}`;
+        if (totIncEl) totIncEl.textContent = formatYen(totalIncome);
+        if (incDetEl) incDetEl.textContent = `収入・確保資産の合計 (${state.incomes.length}件)`;
 
         const totExpEl = document.getElementById('totalExpensesDisplay');
         const expDetEl = document.getElementById('expenseDetailText');
@@ -729,15 +661,14 @@
           }
         }
 
+        const incBadge = document.getElementById('incomeCountBadge');
         const expBadge = document.getElementById('expenseCountBadge');
-        const resBadge = document.getElementById('reserveCountBadge');
+        if (incBadge) incBadge.textContent = state.incomes.length;
         if (expBadge) expBadge.textContent = state.expenses.length;
-        if (resBadge) resBadge.textContent = state.reserves.length;
 
         // 各サブ描画呼び出し
         renderAccountCards();
         renderExpenseTable();
-        renderReserveTable();
         renderIncomeTable();
         renderAccountSettings();
         updateSelectOptions();
@@ -747,33 +678,27 @@
       }
     }
 
-    // タブ切替
+    // タブ切替（左：収入、右：支出）
     function switchTab(tab) {
       currentTab = tab;
-      const tExp = document.getElementById('tabExpenses');
-      const tRes = document.getElementById('tabReserves');
       const tInc = document.getElementById('tabIncomes');
+      const tExp = document.getElementById('tabExpenses');
 
-      const sExp = document.getElementById('expensesSection');
-      const sRes = document.getElementById('reservesSection');
       const sInc = document.getElementById('incomesSection');
+      const sExp = document.getElementById('expensesSection');
 
-      [tExp, tRes, tInc].forEach(b => {
-        if (b) b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1 cursor-pointer';
+      [tInc, tExp].forEach(b => {
+        if (b) b.className = 'flex-1 py-2 px-2 rounded-lg text-slate-600 transition flex items-center justify-center space-x-1.5 cursor-pointer';
       });
-      if (sExp) sExp.classList.add('hidden');
-      if (sRes) sRes.classList.add('hidden');
       if (sInc) sInc.classList.add('hidden');
+      if (sExp) sExp.classList.add('hidden');
 
-      if (tab === 'expenses') {
-        if (tExp) tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
-        if (sExp) sExp.classList.remove('hidden');
-      } else if (tab === 'reserves') {
-        if (tRes) tRes.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
-        if (sRes) sRes.classList.remove('hidden');
-      } else if (tab === 'incomes') {
-        if (tInc) tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1 cursor-pointer';
+      if (tab === 'incomes') {
+        if (tInc) tInc.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer';
         if (sInc) sInc.classList.remove('hidden');
+      } else if (tab === 'expenses') {
+        if (tExp) tExp.className = 'flex-1 py-2 px-2 rounded-lg text-slate-900 bg-white font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer';
+        if (sExp) sExp.classList.remove('hidden');
       }
     }
 
@@ -790,11 +715,8 @@
       if (type === 'expense') {
         title.textContent = '引き落とし明細を追加';
         accField.classList.remove('hidden');
-      } else if (type === 'reserve') {
-        title.textContent = '予備明細を追加';
-        accField.classList.add('hidden');
       } else {
-        title.textContent = '収入項目を追加';
+        title.textContent = '収入・資産項目を追加';
         accField.classList.add('hidden');
       }
 
@@ -815,13 +737,9 @@
         title.textContent = '引き落とし明細を編集';
         accField.classList.remove('hidden');
         if (item) document.getElementById('modalAccountSelect').value = item.account;
-      } else if (type === 'reserve') {
-        item = state.reserves.find(e => e.id === id);
-        title.textContent = '予備明細を編集';
-        accField.classList.add('hidden');
       } else {
         item = state.incomes.find(e => e.id === id);
-        title.textContent = '収入項目を編集';
+        title.textContent = '収入・資産項目を編集';
         accField.classList.add('hidden');
       }
 
@@ -838,8 +756,6 @@
     function deleteItem(type, id) {
       if (type === 'expense') {
         state.expenses = state.expenses.filter(e => e.id !== id);
-      } else if (type === 'reserve') {
-        state.reserves = state.reserves.filter(e => e.id !== id);
       } else {
         state.incomes = state.incomes.filter(e => e.id !== id);
       }
@@ -925,10 +841,9 @@
         renderApp();
       });
 
-      // タブ
-      document.getElementById('tabExpenses').addEventListener('click', () => switchTab('expenses'));
-      document.getElementById('tabReserves').addEventListener('click', () => switchTab('reserves'));
+      // タブ（左：収入、右：支出）
       document.getElementById('tabIncomes').addEventListener('click', () => switchTab('incomes'));
+      document.getElementById('tabExpenses').addEventListener('click', () => switchTab('expenses'));
 
       // フィルター
       document.getElementById('accountFilterSelect').addEventListener('change', (e) => {
@@ -937,9 +852,8 @@
       });
 
       // 追加ボタン
-      document.getElementById('addExpenseBtn').addEventListener('click', () => openAddModal('expense'));
-      document.getElementById('addReserveBtn').addEventListener('click', () => openAddModal('reserve'));
       document.getElementById('addIncomeBtn').addEventListener('click', () => openAddModal('income'));
+      document.getElementById('addExpenseBtn').addEventListener('click', () => openAddModal('expense'));
 
       // モーダル閉じる
       document.getElementById('closeModalBtn').addEventListener('click', closeModal);
@@ -960,9 +874,6 @@
           if (type === 'expense') {
             const item = state.expenses.find(e => e.id === id);
             if (item) { item.name = name; item.amount = amount; item.account = account; }
-          } else if (type === 'reserve') {
-            const item = state.reserves.find(e => e.id === id);
-            if (item) { item.name = name; item.amount = amount; }
           } else {
             const item = state.incomes.find(e => e.id === id);
             if (item) { item.name = name; item.amount = amount; }
@@ -972,8 +883,6 @@
           const newId = 'id-' + Date.now();
           if (type === 'expense') {
             state.expenses.push({ id: newId, name, amount, account });
-          } else if (type === 'reserve') {
-            state.reserves.push({ id: newId, name, amount });
           } else {
             state.incomes.push({ id: newId, name, amount });
           }
