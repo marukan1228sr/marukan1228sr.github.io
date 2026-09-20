@@ -207,7 +207,7 @@
       <button id="toggleAccountSettingsBtn" type="button" class="w-full px-4 py-3 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition text-left cursor-pointer">
         <div class="flex items-center space-x-2">
           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          <span class="text-xs font-bold text-slate-700">引落口座の設定・データのリセット</span>
+          <span class="text-xs font-bold text-slate-700">設定・バックアップ・データ管理</span>
         </div>
         <svg id="accountChevron" class="w-4 h-4 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
       </button>
@@ -221,6 +221,18 @@
         <div class="flex items-center gap-2 pt-1">
           <input type="text" id="newAccountInput" placeholder="新しい口座名（例: ゆうちょ銀行）" class="text-xs border border-slate-200 rounded-lg px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-emerald-500">
           <button id="createAccountBtn" type="button" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold cursor-pointer">口座追加</button>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 space-y-2">
+          <div>
+            <div class="text-xs font-bold text-slate-700">機種変更用バックアップ</div>
+            <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">すべての月・収入・支出・口座・振込チェック状態をJSONファイルに保存します。iCloud Driveなどへ保管してください。</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="exportBackupBtn" type="button" class="px-3 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold cursor-pointer">バックアップを保存</button>
+            <button id="importBackupBtn" type="button" class="px-3 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-xl text-xs font-bold cursor-pointer">バックアップから復元</button>
+          </div>
+          <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden">
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
@@ -452,6 +464,42 @@
           console.warn("クラウド保存エラー:", e);
         }
       }
+    }
+
+    function exportBackup() {
+      const payload = {
+        app: 'kakeibo-transfer-navi',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        store
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kakeibo-backup-${store.targetMonth || 'all'}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('バックアップを書き出しました');
+    }
+
+    async function importBackup(file) {
+      const parsed = JSON.parse(await file.text());
+      const restored = parsed && parsed.app === 'kakeibo-transfer-navi' ? parsed.store : parsed?.store;
+      if (!restored || !Array.isArray(restored.accounts) || !restored.monthlyData || typeof restored.monthlyData !== 'object') {
+        throw new Error('家計簿のバックアップ形式ではありません');
+      }
+      if (!/^\d{4}-\d{2}$/.test(String(restored.targetMonth || ''))) {
+        throw new Error('対象月が正しくありません');
+      }
+      if (!confirm(`バックアップの内容で現在の家計簿データを置き換えますか？\n\nバックアップ作成日時：${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString('ja-JP') : '不明'}\n対象月：${restored.targetMonth}`)) return;
+      store = JSON.parse(JSON.stringify(restored));
+      ensureMonthData(store.targetMonth);
+      await saveData();
+      renderApp();
+      showToast('バックアップから復元しました');
     }
 
     function toggleIncomeAccordion(forceState) {
@@ -1079,6 +1127,23 @@
         saveData();
         renderApp();
         showToast(`口座「${val}」を追加しました`);
+      });
+
+      // 機種変更用バックアップ
+      document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
+      document.getElementById('importBackupBtn').addEventListener('click', () => {
+        const input = document.getElementById('backupFileInput');
+        input.value = '';
+        input.click();
+      });
+      document.getElementById('backupFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          await importBackup(file);
+        } catch (err) {
+          alert(`バックアップを復元できませんでした。\n${err?.message || 'ファイルを確認してください'}`);
+        }
       });
 
       // データ初期化
